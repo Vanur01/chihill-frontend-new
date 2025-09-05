@@ -361,9 +361,27 @@ export const useCartUtils = () => {
   const getItemQuantity = (productId: string, variantSku?: string) => {
     if (!cart?.items) return 0;
     
-    const item = cart.items.find(
-      item => item.productId === productId && item.variantSku === variantSku
-    );
+    const item = cart.items.find(item => {
+      // Handle both string and object productId
+      const itemProductId = typeof item.productId === 'string' 
+        ? item.productId 
+        : item.productId._id;
+      
+      const matches = itemProductId === productId && item.variantSku === variantSku;
+      
+      // Debug logging
+      if (productId && variantSku) {
+        console.log('Cart item check:', {
+          itemProductId,
+          targetProductId: productId,
+          itemVariantSku: item.variantSku,
+          targetVariantSku: variantSku,
+          matches
+        });
+      }
+      
+      return matches;
+    });
     return item?.quantity || 0;
   };
 

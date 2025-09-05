@@ -50,7 +50,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
     setWishlistAnimating(true);
     setTimeout(() => {
       setWishlistAnimating(false);
-    }, 400);
+    }, 200);
     
     try {
       if (isInWishlist(product._id)) {
@@ -91,7 +91,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             disabled={wishlistLoading}
           >
             <Heart 
-              className={`w-4 h-4 transition-all duration-300 ease-out transform ${
+              className={`w-4 h-4 transition-all duration-200 ease-out transform ${
                 isInWishlist(product._id)
                   ? "fill-red-500 text-red-500 heart-beat"
                   : "text-gray-400 hover:text-red-500 hover:scale-110"
@@ -156,7 +156,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           disabled={wishlistLoading}
         >
           <Heart 
-            className={`w-5 h-5 transition-all duration-300 ease-out transform ${
+            className={`w-5 h-5 transition-all duration-200 ease-out transform ${
               isInWishlist(product._id)
                 ? "fill-red-500 text-red-500 heart-beat"
                 : "text-gray-400 hover:text-red-500 hover:scale-110"

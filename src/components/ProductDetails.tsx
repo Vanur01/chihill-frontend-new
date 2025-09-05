@@ -11,19 +11,23 @@ import { useHomeStore } from "@/store/homeStore";
 import useProductStore from "@/store/ProductStore";
 import ReviewSection from "./ReviewSection";
 import { useAuthStore } from "@/store/authStore";
+import { ShoppingCart } from "lucide-react";
 
 interface ProductDetailsProps {
   slug?: string;
   onProductLoaded?: (productId: string) => void;
 }
 
-const ProductDetails: React.FC<ProductDetailsProps> = ({ slug: propSlug, onProductLoaded }) => {
+const ProductDetails: React.FC<ProductDetailsProps> = ({
+  slug: propSlug,
+  onProductLoaded,
+}) => {
   const params = useParams();
   const router = useRouter();
-  
+
   // Get slug from props or URL params
   const slug = propSlug || (params?.slug as string);
-  
+
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);
@@ -36,19 +40,24 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ slug: propSlug, onProdu
   const { user, isAuthenticated } = useAuthStore();
 
   // Product store
-  const { currentProduct, productLoading, error: productError, getProductBySlug } = useProductStore();
-  
+  const {
+    currentProduct,
+    productLoading,
+    error: productError,
+    getProductBySlug,
+  } = useProductStore();
+
   // Initialize state variables for variant selection
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
-  
+
   // Get product data on component mount
   useEffect(() => {
     if (slug) {
       getProductBySlug(slug);
     }
-    
+
     // Cleanup function
     return () => {
       useProductStore.getState().clearCurrentProduct();
@@ -72,23 +81,24 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ slug: propSlug, onProdu
   const selectedVariant = currentProduct?.variants?.[selectedVariantIndex];
   const productId = currentProduct?._id;
   const variantSku = selectedVariant?.sku;
-  
+
   // Call onProductLoaded when productId is available
   useEffect(() => {
     if (productId && onProductLoaded) {
       onProductLoaded(productId);
     }
   }, [productId, onProductLoaded]);
-  
+
   // Update selected variant when size or color changes
   useEffect(() => {
     if (currentProduct?.variants && (selectedSize || selectedColor)) {
-      const variantIndex = currentProduct.variants.findIndex(v => {
+      const variantIndex = currentProduct.variants.findIndex((v) => {
         const sizeMatch = !selectedSize || v.attributes.size === selectedSize;
-        const colorMatch = !selectedColor || v.attributes.color === selectedColor;
+        const colorMatch =
+          !selectedColor || v.attributes.color === selectedColor;
         return sizeMatch && colorMatch;
       });
-      
+
       if (variantIndex !== -1 && variantIndex !== selectedVariantIndex) {
         setSelectedVariantIndex(variantIndex);
         setSelectedImage(0); // Reset image to first when variant changes
@@ -99,12 +109,27 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ slug: propSlug, onProdu
   }, [selectedSize, selectedColor, currentProduct, selectedVariantIndex]);
 
   // Cart state selectors
-  const { addToCart } = useCartStore();
+  const { addToCart, fetchCart } = useCartStore();
   const { isItemInCart } = useCartUtils();
-  
+
+  // Fetch cart when user is authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchCart().catch(() => {
+        // Silent error handling for background fetch
+      });
+    }
+  }, [isAuthenticated, fetchCart]);
+
   // Wishlist state and actions
-  const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist, itemIds, fetchWishlist } = useWishlistStore();
-  
+  const {
+    addItem: addToWishlist,
+    removeItem: removeFromWishlist,
+    isInWishlist,
+    itemIds,
+    fetchWishlist,
+  } = useWishlistStore();
+
   // Fetch wishlist when user is authenticated and wishlist is empty
   useEffect(() => {
     if (isAuthenticated && itemIds.length === 0) {
@@ -113,7 +138,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ slug: propSlug, onProdu
       });
     }
   }, [isAuthenticated, itemIds.length, fetchWishlist]);
-  
+
   // Auto-dismiss wishlist error after 3 seconds
   useEffect(() => {
     if (wishlistError) {
@@ -123,7 +148,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ slug: propSlug, onProdu
       return () => clearTimeout(timer);
     }
   }, [wishlistError]);
-  
+
   // Recently viewed
   const { addProductToRecentlyViewed } = useHomeStore();
 
@@ -134,27 +159,22 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ slug: propSlug, onProdu
     }
   }, [productId, addProductToRecentlyViewed]);
 
-  // Extract product images and variant images with proper fallback
+  // Extract variant images only (no main product images)
   const productImages = useMemo(() => {
     if (!currentProduct) return [];
-    
+
     let images = [];
-    
-    // Add variant-specific images first if available
+
+    // Add variant-specific images only if available
     if (selectedVariant?.images?.length) {
       images.push(...selectedVariant.images);
     }
-    
-    // Add main product images
-    if (currentProduct.images?.length) {
-      images.push(...currentProduct.images);
-    }
-    
+
     // Remove duplicates and filter out null/undefined
     const uniqueImages = [...new Set(images.filter(Boolean))];
-    
-    // Return at least one fallback image if no images exist
-    return uniqueImages.length > 0 ? uniqueImages : ['/image.png'];
+
+    // Return at least one fallback image if no variant images exist
+    return uniqueImages.length > 0 ? uniqueImages : ["/image.png"];
   }, [currentProduct, selectedVariant]);
 
   // Reset selected image if it's out of bounds
@@ -163,93 +183,134 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ slug: propSlug, onProdu
       setSelectedImage(0);
     }
   }, [productImages.length, selectedImage]);
-  
+
   // Extract available colors and sizes from variants
   const availableOptions = useMemo(() => {
     if (!currentProduct?.variants) return { colors: [], sizes: [] };
-    
+
     // Get unique colors
     const colors = currentProduct.variants
-      .map(v => v.attributes.color)
+      .map((v) => v.attributes.color)
       .filter(Boolean)
       .filter((color, index, self) => self.indexOf(color) === index)
-      .map(color => ({
+      .map((color) => ({
         name: color,
-        available: currentProduct.variants.some(v => 
-          v.attributes.color === color && v.stock > 0
-        )
+        available: currentProduct.variants.some(
+          (v) => v.attributes.color === color && v.stock > 0
+        ),
       }));
-      
-    // Get unique sizes
-    const sizes = currentProduct.variants
-      .map(v => v.attributes.size)
-      .filter(Boolean)
-      .filter((size, index, self) => self.indexOf(size) === index)
-      .map(size => ({
-        name: size,
-        available: currentProduct.variants.some(v => 
-          v.attributes.size === size && v.stock > 0
-        )
-      }));
-    
+
+    // Get sizes only for the selected color (if any color is selected)
+    let sizes = [];
+    if (selectedColor) {
+      // Only show sizes for the selected color
+      sizes = currentProduct.variants
+        .filter((v) => v.attributes.color === selectedColor)
+        .map((v) => v.attributes.size)
+        .filter(Boolean)
+        .filter((size, index, self) => self.indexOf(size) === index)
+        .map((size) => ({
+          name: size,
+          available: currentProduct.variants.some(
+            (v) =>
+              v.attributes.color === selectedColor &&
+              v.attributes.size === size &&
+              v.stock > 0
+          ),
+        }));
+    } else {
+      // If no color is selected, show all sizes (original behavior)
+      sizes = currentProduct.variants
+        .map((v) => v.attributes.size)
+        .filter(Boolean)
+        .filter((size, index, self) => self.indexOf(size) === index)
+        .map((size) => ({
+          name: size,
+          available: currentProduct.variants.some(
+            (v) => v.attributes.size === size && v.stock > 0
+          ),
+        }));
+    }
+
     return { colors, sizes };
-  }, [currentProduct]);
+  }, [currentProduct, selectedColor]); // Added selectedColor as dependency
 
   // Optimized quantity handlers
   const decreaseQuantity = useCallback(() => {
-    setQuantity(prev => Math.max(1, prev - 1));
+    setQuantity((prev) => Math.max(1, prev - 1));
   }, []);
 
   const increaseQuantity = useCallback(() => {
     if (selectedVariant && quantity < selectedVariant.stock) {
-      setQuantity(prev => prev + 1);
+      setQuantity((prev) => prev + 1);
     }
   }, [selectedVariant, quantity]);
 
   // Optimized wishlist toggle
   const toggleWishlist = useCallback(async () => {
-    console.log('toggleWishlist called', { isAuthenticated, productId, wishlistLoading });
-    
+    console.log("toggleWishlist called", {
+      isAuthenticated,
+      productId,
+      wishlistLoading,
+    });
+
     if (!isAuthenticated) {
       setWishlistError("Please login to add items to wishlist");
       return;
     }
 
     if (wishlistLoading || !productId) return;
-    
+
     setWishlistError("");
     setWishlistLoading(true);
-    
-    // Trigger pop animation
+
+    // Trigger quick pop animation
     setWishlistAnimating(true);
     setTimeout(() => {
       setWishlistAnimating(false);
-    }, 400);
-    
+    }, 100);
+
     try {
       const isCurrentlyInWishlist = isInWishlist(productId);
-      console.log('Current wishlist state:', { isCurrentlyInWishlist, itemIds });
-      
+      console.log("Current wishlist state:", {
+        isCurrentlyInWishlist,
+        itemIds,
+      });
+
       if (isCurrentlyInWishlist) {
-        console.log('Removing from wishlist');
+        console.log("Removing from wishlist");
         await removeFromWishlist(productId);
       } else {
-        console.log('Adding to wishlist');
+        console.log("Adding to wishlist");
         await addToWishlist(productId);
       }
-      console.log('Wishlist operation completed successfully');
+      console.log("Wishlist operation completed successfully");
     } catch (error: any) {
-      console.error('Wishlist operation failed:', error);
+      console.error("Wishlist operation failed:", error);
       setWishlistError(error?.message || "Failed to update wishlist");
     } finally {
       setWishlistLoading(false);
     }
-  }, [isAuthenticated, wishlistLoading, productId, isInWishlist, removeFromWishlist, addToWishlist, itemIds]);
+  }, [
+    isAuthenticated,
+    wishlistLoading,
+    productId,
+    isInWishlist,
+    removeFromWishlist,
+    addToWishlist,
+    itemIds,
+  ]);
 
   // Optimized buy now handler
   const handleBuyNow = useCallback(async () => {
-    if (!selectedVariant || selectedVariant.stock <= 0 || !productId || !variantSku) return;
-    
+    if (
+      !selectedVariant ||
+      selectedVariant.stock <= 0 ||
+      !productId ||
+      !variantSku
+    )
+      return;
+
     // Add to cart first, then navigate
     try {
       await addToCart({ productId, variantSku, quantity });
@@ -265,15 +326,15 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ slug: propSlug, onProdu
       setAddError("Please select a valid product variant");
       return;
     }
-    
+
     if (selectedVariant.stock <= 0) {
       setAddError("This variant is out of stock");
       return;
     }
-    
+
     setAddLoading(true);
     setAddError("");
-    
+
     try {
       await addToCart({ productId, variantSku, quantity });
     } catch (err: any) {
@@ -289,11 +350,43 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ slug: propSlug, onProdu
     setAddError(""); // Clear errors when selection changes
   }, []);
 
-  // Color selection handler  
-  const handleColorSelect = useCallback((color: string) => {
-    setSelectedColor(color);
-    setAddError(""); // Clear errors when selection changes
-  }, []);
+  // Color selection handler
+  const handleColorSelect = useCallback(
+    (color: string) => {
+      setSelectedColor(color);
+      setAddError(""); // Clear errors when selection changes
+
+      // Auto-select the first available size for the new color
+      if (currentProduct?.variants) {
+        const availableSizesForColor = currentProduct.variants
+          .filter(
+            (v) =>
+              v.attributes.color === color && v.stock > 0 && v.attributes.size
+          )
+          .map((v) => v.attributes.size!)
+          .filter((size, index, self) => self.indexOf(size) === index);
+
+        if (availableSizesForColor.length > 0) {
+          // Sort sizes and select the first one
+          const sizeOrder = ["XS", "S", "M", "L", "XL", "XXL"];
+          const sortedSizes = availableSizesForColor.sort((a, b) => {
+            const aIndex = sizeOrder.indexOf(a);
+            const bIndex = sizeOrder.indexOf(b);
+
+            if (aIndex === -1 && bIndex === -1) return a.localeCompare(b);
+            if (aIndex === -1) return 1;
+            if (bIndex === -1) return -1;
+            return aIndex - bIndex;
+          });
+
+          setSelectedSize(sortedSizes[0]);
+        } else {
+          setSelectedSize(""); // No available sizes for this color
+        }
+      }
+    },
+    [currentProduct]
+  );
 
   // Loading state
   if (productLoading) {
@@ -322,7 +415,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ slug: propSlug, onProdu
               <p className="mt-2 text-gray-600">
                 {productError || "The product you're looking for doesn't exist"}
               </p>
-              <button 
+              <button
                 onClick={() => router.push("/")}
                 className="mt-4 px-6 py-2 bg-primary1 text-white rounded-lg"
               >
@@ -348,7 +441,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ slug: propSlug, onProdu
                 alt={`${currentProduct.name} - View ${selectedImage + 1}`}
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 px-16"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/image.png';
+                  (e.target as HTMLImageElement).src = "/image.png";
                 }}
               />
             </div>
@@ -371,7 +464,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ slug: propSlug, onProdu
                       alt={`View ${index + 1} of ${currentProduct.name}`}
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/image.png';
+                        (e.target as HTMLImageElement).src = "/image.png";
                       }}
                     />
                   </button>
@@ -401,7 +494,9 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ slug: propSlug, onProdu
                       />
                     ))}
                   </div>
-                  <span className="text-gray-600">{currentProduct.avgRating.toFixed(1)}</span>
+                  <span className="text-gray-600">
+                    {currentProduct.avgRating.toFixed(1)}
+                  </span>
                   {currentProduct.totalReviews > 0 && (
                     <button className="text-blue-600 hover:text-blue-700 text-sm underline">
                       See all {currentProduct.totalReviews} reviews
@@ -409,29 +504,41 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ slug: propSlug, onProdu
                   )}
                 </div>
                 {currentProduct.shortDescription && (
-                  <p className="text-gray-600 mt-1">{currentProduct.shortDescription}</p>
+                  <p className="text-gray-600 mt-1">
+                    {currentProduct.shortDescription}
+                  </p>
                 )}
               </div>
               <div className="flex flex-col items-center">
-                <button 
+                <button
                   onClick={toggleWishlist}
                   disabled={wishlistLoading || !productId || !isAuthenticated}
-                  className={`relative transition-all duration-300 ease-out transform ${wishlistLoading ? 'opacity-50' : 'hover:scale-110'}`}
+                  className={`relative transition-all duration-150 ease-out transform ${
+                    wishlistLoading ? "opacity-50" : "hover:scale-105"
+                  }`}
                 >
                   <Heart
-                    className={`w-8 h-8 cursor-pointer p-1 transition-all duration-300 ease-out transform ${
-                      isInWishlist(productId || '')
-                        ? "fill-red-500 text-red-500 heart-beat"
-                        : "text-gray-400 hover:text-red-500 hover:scale-110"
-                    } ${wishlistLoading ? 'animate-bounce scale-95 opacity-70' : ''} 
-                    ${wishlistAnimating ? 'heart-pop' : ''}`}
+                    className={`w-8 h-8 cursor-pointer p-1 transition-all duration-100 ease-out transform ${
+                      isInWishlist(productId || "")
+                        ? "fill-red-500 text-red-500"
+                        : "text-gray-400 hover:text-red-500 hover:scale-105"
+                    } ${
+                      wishlistLoading
+                        ? "animate-pulse scale-95 opacity-70"
+                        : ""
+                    } 
+                    ${wishlistAnimating ? "heart-pop" : ""}`}
                   />
                 </button>
                 {!isAuthenticated && (
-                  <span className="text-xs text-gray-500 mt-1">Login to save</span>
+                  <span className="text-xs text-gray-500 mt-1">
+                    Login to save
+                  </span>
                 )}
                 {wishlistError && (
-                  <span className="text-red-500 text-xs mt-1">{wishlistError}</span>
+                  <span className="text-red-500 text-xs mt-1">
+                    {wishlistError}
+                  </span>
                 )}
               </div>
             </div>
@@ -440,25 +547,40 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ slug: propSlug, onProdu
             <div className="flex items-baseline">
               {selectedVariant && (
                 <>
-                  <span className="text-3xl font-bold text-gray-900">₹{selectedVariant.price.toFixed(2)}</span>
-                  {selectedVariant.mrp && selectedVariant.mrp > selectedVariant.price && (
-                    <>
-                      <span className="ml-3 text-xl text-gray-500 line-through">₹{selectedVariant.mrp.toFixed(2)}</span>
-                      <span className="ml-3 text-sm text-green-600">
-                        {Math.round(((selectedVariant.mrp - selectedVariant.price) / selectedVariant.mrp) * 100)}% off
-                      </span>
-                    </>
-                  )}
+                  <span className="text-3xl font-bold text-gray-900">
+                    ₹{selectedVariant.price.toFixed(2)}
+                  </span>
+                  {selectedVariant.mrp &&
+                    selectedVariant.mrp > selectedVariant.price && (
+                      <>
+                        <span className="ml-3 text-xl text-gray-500 line-through">
+                          ₹{selectedVariant.mrp.toFixed(2)}
+                        </span>
+                        <span className="ml-3 text-sm text-green-600">
+                          {Math.round(
+                            ((selectedVariant.mrp - selectedVariant.price) /
+                              selectedVariant.mrp) *
+                              100
+                          )}
+                          % off
+                        </span>
+                      </>
+                    )}
                 </>
               )}
             </div>
-            
+
             {/* Discount or Offer */}
-            {currentProduct.buyXGetY && currentProduct.buyXGetY.x > 0 && currentProduct.buyXGetY.y > 0 && (
-              <div className="bg-blue-50 border border-blue-200 rounded-md p-3 text-blue-800">
-                <p className="font-medium">Special Offer: Buy {currentProduct.buyXGetY.x} Get {currentProduct.buyXGetY.y} Free!</p>
-              </div>
-            )}
+            {currentProduct.buyXGetY &&
+              currentProduct.buyXGetY.x > 0 &&
+              currentProduct.buyXGetY.y > 0 && (
+                <div className="bg-blue-50 border border-blue-200 rounded-md p-3 text-blue-800">
+                  <p className="font-medium">
+                    Special Offer: Buy {currentProduct.buyXGetY.x} Get{" "}
+                    {currentProduct.buyXGetY.y} Free!
+                  </p>
+                </div>
+              )}
 
             {/* Color Selection */}
             {availableOptions.colors.length > 0 && (
@@ -469,39 +591,78 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ slug: propSlug, onProdu
                   </h3>
                 </div>
                 <div className="flex space-x-3">
-                  {availableOptions.colors.map((color) => (
-                    <button
-                      key={color.name}
-                      onClick={() => color.name && handleColorSelect(color.name)}
-                      disabled={!color.available}
-                      className={`w-10 h-10 rounded-lg border-2 transition-all duration-200 relative ${
-                        selectedColor === color.name
-                          ? "border-blue-500 scale-110 shadow-lg"
-                          : color.available 
+                  {availableOptions.colors.map((color) => {
+                    const colorMap: { [key: string]: string } = {
+                      Red: "#FF0000",
+                      Blue: "#0000FF",
+                      Green: "#008000",
+                      Yellow: "#FFFF00",
+                      Golden: "#FFD700",
+                      Black: "#000000",
+                      White: "#FFFFFF",
+                      Gray: "#808080",
+                      Silver: "#C0C0C0",
+                      Brown: "#A52A2A",
+                      Orange: "#FFA500",
+                      Pink: "#FFC0CB",
+                      Purple: "#800080",
+                      Violet: "#EE82EE",
+                      Indigo: "#4B0082",
+                      Cyan: "#00FFFF",
+                      Teal: "#008080",
+                      Navy: "#000080",
+                      Maroon: "#800000",
+                      Olive: "#808000",
+                      Lime: "#00FF00",
+                      Coral: "#FF7F50",
+                      Beige: "#F5F5DC",
+                      Khaki: "#F0E68C",
+                      Gold: "#FFD700",
+                      SilverGray: "#C0C0C0",
+                      Magenta: "#FF00FF",
+                      SkyBlue: "#87CEEB",
+                      LightBlue: "#ADD8E6",
+                      DarkBlue: "#00008B",
+                      LightGreen: "#90EE90",
+                      DarkGreen: "#006400",
+                      LightGray: "#D3D3D3",
+                      DarkGray: "#A9A9A9",
+                      Chocolate: "#D2691E",
+                      Crimson: "#DC143C",
+                      Turquoise: "#40E0D0",
+                      Aqua: "#00FFFF",
+                      Lavender: "#E6E6FA",
+                      Peach: "#FFE5B4",
+                      Mint: "#98FF98",
+                      Rose: "#FF007F",
+                    };
+
+                    const bgColor = colorMap[color.name] || "#FFFFFF";
+                    return (
+                      <button
+                        key={color.name}
+                        onClick={() =>
+                          color.name && handleColorSelect(color.name)
+                        }
+                        disabled={!color.available}
+                        className={`w-10 h-10 rounded-lg border-2 transition-all duration-200 relative ${
+                          selectedColor === color.name
+                            ? "border-blue-500 scale-110 shadow-lg"
+                            : color.available
                             ? "border-gray-300 hover:border-gray-400"
                             : "border-gray-200 opacity-50"
-                      }`}
-                      // style={{
-                      //   backgroundColor: color.name.toLowerCase() === 'white' ? '#ffffff' :
-                      //                   color.name.toLowerCase() === 'black' ? '#000000' :
-                      //                   color.name.toLowerCase() === 'red' ? '#ef4444' :
-                      //                   color.name.toLowerCase() === 'blue' ? '#3b82f6' :
-                      //                   color.name.toLowerCase() === 'green' ? '#10b981' :
-                      //                   color.name.toLowerCase() === 'yellow' ? '#f59e0b' :
-                      //                   color.name.toLowerCase() === 'pink' ? '#ec4899' :
-                      //                   color.name.toLowerCase() === 'purple' ? '#8b5cf6' :
-                      //                   color.name.toLowerCase() === 'gray' || color.name.toLowerCase() === 'grey' ? '#6b7280' :
-                      //                   '#f3f4f6'
-                      // }}
-                      title={color.name}
-                    >
-                      {!color.available && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-6 h-0.5 bg-red-500 rotate-45"></div>
-                        </div>
-                      )}
-                    </button>
-                  ))}
+                        }`}
+                        title={color.name}
+                        style={{ backgroundColor: bgColor }}
+                      >
+                        {!color.available && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-6 h-0.5 bg-red-500 rotate-45"></div>
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -530,8 +691,8 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ slug: propSlug, onProdu
                         selectedSize === size.name
                           ? "bg-primary1 text-white border-primary1"
                           : size.available
-                            ? "bg-white text-gray-900 border-gray-300 hover:border-gray-400"
-                            : "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+                          ? "bg-white text-gray-900 border-gray-300 hover:border-gray-400"
+                          : "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
                       }`}
                     >
                       {size.name}
@@ -544,7 +705,9 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ slug: propSlug, onProdu
                   ))}
                 </div>
                 <div className="mt-2 text-sm text-gray-600">
-                  📏 {selectedVariant?.title || 'Select size and color to see variant details'}
+                  📏{" "}
+                  {selectedVariant?.title ||
+                    "Select size and color to see variant details"}
                 </div>
               </div>
             )}
@@ -571,12 +734,19 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ slug: propSlug, onProdu
                 <div className="text-sm">
                   <p className="font-medium text-gray-900">Standard Shipping</p>
                   <p className="text-gray-600">
-                    The estimated shipping date for this product is by {new Date(new Date().setDate(new Date().getDate() + 7)).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}.
+                    The estimated shipping date for this product is by{" "}
+                    {new Date(
+                      new Date().setDate(new Date().getDate() + 7)
+                    ).toLocaleDateString("en-US", {
+                      month: "long",
+                      day: "numeric",
+                    })}
+                    .
                   </p>
                 </div>
               </div>
             </div>
-            
+
             {/* Return Policy */}
             {currentProduct.returnPolicy && (
               <div className="text-sm text-gray-600">
@@ -587,8 +757,8 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ slug: propSlug, onProdu
             {/* Custom Size Login */}
             <button
               className={`w-full py-3 rounded-lg transition-colors ${
-                isAuthenticated 
-                  ? "bg-white text-gray-700 hover:bg-gray-200" 
+                isAuthenticated
+                  ? "bg-white text-gray-700 hover:bg-gray-200"
                   : "bg-gray-100 text-gray-500 cursor-not-allowed"
               }`}
               onClick={() => isAuthenticated && setIsCustomSizeOpen(true)}
@@ -603,7 +773,11 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ slug: propSlug, onProdu
                 <div className="flex items-center border border-gray-300 rounded-lg">
                   <button
                     onClick={decreaseQuantity}
-                    disabled={!selectedVariant || selectedVariant.stock <= 0 || quantity <= 1}
+                    disabled={
+                      !selectedVariant ||
+                      selectedVariant.stock <= 0 ||
+                      quantity <= 1
+                    }
                     className="p-3 hover:bg-gray-100 transition-colors rounded-l-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Minus className="w-4 h-4 text-gray-600" />
@@ -613,7 +787,11 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ slug: propSlug, onProdu
                   </span>
                   <button
                     onClick={increaseQuantity}
-                    disabled={!selectedVariant || selectedVariant.stock <= 0 || quantity >= selectedVariant.stock}
+                    disabled={
+                      !selectedVariant ||
+                      selectedVariant.stock <= 0 ||
+                      quantity >= selectedVariant.stock
+                    }
                     className="p-3 hover:bg-gray-100 transition-colors rounded-r-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Plus className="w-4 h-4 text-gray-600" />
@@ -622,17 +800,25 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ slug: propSlug, onProdu
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                {productId && variantSku && isItemInCart(productId, variantSku) ? (
+                {productId &&
+                variantSku &&
+                isItemInCart(productId, variantSku) ? (
                   <button
                     onClick={() => router.push("/cart-details")}
-                    className="py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+                    className="py-4 border-2 border-gray-300 text-gray-900 rounded-lg hover:border-gray-400 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center"
                   >
-                    Go to Cart 🛒
+                    Go to Cart
+                    <ShoppingCart className="w-4 h-4 ml-3" />
                   </button>
                 ) : (
                   <button
                     onClick={handleAddToCart}
-                    disabled={addLoading || !selectedVariant || selectedVariant.stock <= 0 || !selectedSize}
+                    disabled={
+                      addLoading ||
+                      !selectedVariant ||
+                      selectedVariant.stock <= 0 ||
+                      !selectedSize
+                    }
                     className="py-4 border-2 border-gray-300 text-gray-900 rounded-lg hover:border-gray-400 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {addLoading ? (
@@ -641,20 +827,29 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ slug: propSlug, onProdu
                         Adding...
                       </div>
                     ) : (
-                      "Add to Cart 🛒"
+                      <div className="flex items-center justify-center">
+                        Add to Cart
+                        <ShoppingCart className="w-4 h-4 ml-3" />
+                      </div>
                     )}
                   </button>
                 )}
                 <button
                   onClick={handleBuyNow}
-                  disabled={!selectedVariant || selectedVariant.stock <= 0 || !selectedSize}
+                  disabled={
+                    !selectedVariant ||
+                    selectedVariant.stock <= 0 ||
+                    !selectedSize
+                  }
                   className="py-4 bg-primary1 text-white rounded-lg hover:opacity-90 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Buy Now →
                 </button>
               </div>
               {addError && (
-                <p className="text-red-500 text-sm mt-2 p-2 bg-red-50 rounded">{addError}</p>
+                <p className="text-red-500 text-sm mt-2 p-2 bg-red-50 rounded">
+                  {addError}
+                </p>
               )}
             </div>
 
@@ -692,19 +887,22 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ slug: propSlug, onProdu
             {currentProduct.tags && currentProduct.tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {currentProduct.tags.map((tag, index) => (
-                  <span key={index} className="px-3 py-1 bg-gray-100 text-gray-800 text-sm rounded-full">
+                  <span
+                    key={index}
+                    className="px-3 py-1 bg-gray-100 text-gray-800 text-sm rounded-full"
+                  >
                     #{tag}
                   </span>
                 ))}
               </div>
             )}
-            
+
             {/* Review Section */}
-            <ReviewSection productId={productId || ''} />
+            <ReviewSection productId={productId || ""} />
           </div>
         </div>
       </div>
-      
+
       {/* Modals */}
       {isSizeChartOpen && (
         <SizeChartModal onClose={() => setIsSizeChartOpen(false)} />

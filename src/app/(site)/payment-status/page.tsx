@@ -13,6 +13,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { Suspense } from "react";
+import ProtectedRoute from "@/components/RouteProtect";
 import {
   usePaymentActions,
   usePaymentLoading,
@@ -521,14 +522,16 @@ function OrderSuccessContent() {
 
 export default function OrderSuccess() {
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center font-lato">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary1"></div>
-        </div>
-      }
-    >
-      <OrderSuccessContent />
-    </Suspense>
+    <ProtectedRoute>
+      <Suspense
+        fallback={
+          <div className="min-h-screen flex items-center justify-center font-lato">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary1"></div>
+          </div>
+        }
+      >
+        <OrderSuccessContent />
+      </Suspense>
+    </ProtectedRoute>
   );
 }

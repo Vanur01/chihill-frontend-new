@@ -1,5 +1,6 @@
 import OrderDetails from '@/components/OrderDetails'
 import ProductCarousel from '@/components/PeopleBought'
+import ProtectedRoute from '@/components/RouteProtect'
 import React from 'react'
 
 interface PageProps {
@@ -10,9 +11,11 @@ interface PageProps {
 
 export default function OrderDetailsPage({ params }: PageProps) {
   return (
-    <div>
-      <OrderDetails orderId={params.id} />
-      <ProductCarousel/>
-    </div>
+    <ProtectedRoute>
+      <div>
+        <OrderDetails orderId={params.id} />
+        <ProductCarousel/>
+      </div>
+    </ProtectedRoute>
   )
 }

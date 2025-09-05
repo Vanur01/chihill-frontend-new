@@ -23,6 +23,7 @@ type AuthState = {
   user: AuthUser | null;
   token: string | null; // short-lived access token
   isAuthenticated: boolean;
+  loading: boolean;
 
   // actions
   setAuth: (user: AuthUser, token: string) => void;
@@ -31,12 +32,14 @@ type AuthState = {
   refreshToken: () => Promise<void>;
   logout: () => Promise<void>;
   getCurrentUser: () => Promise<void>;
+  setLoading: (loading: boolean) => void;
 };
 
 export const useAuthStore = create<AuthState>()((set,get) => ({
   user: null,
   token: null,
   isAuthenticated: false,
+  loading: false,
 
   setAuth: (user, token) =>
     set({ user, token, isAuthenticated: Boolean(token) }),
@@ -44,20 +47,28 @@ export const useAuthStore = create<AuthState>()((set,get) => ({
   clearAuth: () =>
     set({ user: null, token: null, isAuthenticated: false }),
 
+  setLoading: (loading) => set({ loading }),
+
   login: async (identifier, password) => {
-    const payload = {
-      identifier: identifier.includes("@") ? identifier : "91" + identifier,
-      password,
-    };
+    set({ loading: true });
+    try {
+      const payload = {
+        identifier: identifier.includes("@") ? identifier : "91" + identifier,
+        password,
+      };
 
-    // backend should return accessToken + set refreshToken in HttpOnly cookie
-    const response = await login(payload);
-    const { user, accessToken } = response.data.data;
+      // backend should return accessToken + set refreshToken in HttpOnly cookie
+      const response = await login(payload);
+      const { user, accessToken } = response.data.data;
 
-    set({ user, token: accessToken, isAuthenticated: true });
+      set({ user, token: accessToken, isAuthenticated: true });
+    } finally {
+      set({ loading: false });
+    }
   },
 
   refreshToken: async () => {
+    set({ loading: true });
     try {
       const response = await refresh(); // backend reads refresh cookie
       const { user, accessToken } = response.data.data;
@@ -69,6 +80,9 @@ export const useAuthStore = create<AuthState>()((set,get) => ({
         await get().getCurrentUser();
     } catch {
       set({ user: null, token: null, isAuthenticated: false });
+      throw new Error('Token refresh failed');
+    } finally {
+      set({ loading: false });
     }
   },
 
@@ -78,6 +92,7 @@ export const useAuthStore = create<AuthState>()((set,get) => ({
   },
 
   getCurrentUser: async () => {
+    set({ loading: true });
     try {
       console.log('Fetching current user from /auth/me...');
       const response = await getCurrentUser();
@@ -96,6 +111,8 @@ export const useAuthStore = create<AuthState>()((set,get) => ({
       // If getting current user fails, clear auth state
       set({ user: null, token: null, isAuthenticated: false });
       throw error;
+    } finally {
+      set({ loading: false });
     }
   },
 }));

@@ -2,6 +2,7 @@
 import SavedForLater from "@/components/cart/SavedForLater";
 import ShoppingCart from "@/components/cart/ShoppingCart";
 import PeopleBought from "@/components/PeopleBought";
+import ProtectedRoute from "@/components/RouteProtect";
 import { useCartStore } from "@/store/cartStore";
 import React from "react";
 
@@ -15,13 +16,15 @@ const cartDetails = () => {
       : undefined;
       
   return (
-    <div className="">
-      <ShoppingCart />
-      <SavedForLater />
-      {cart && cart.items && cart.items.length > 0 && (
-        <PeopleBought productId={productId} />
-      )}
-    </div>
+    <ProtectedRoute>
+      <div className="">
+        <ShoppingCart />
+        <SavedForLater />
+        {cart && cart.items && cart.items.length > 0 && (
+          <PeopleBought productId={productId} />
+        )}
+      </div>
+    </ProtectedRoute>
   );
 };
 

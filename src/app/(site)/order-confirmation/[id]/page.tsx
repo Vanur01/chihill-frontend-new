@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
 import { getOrderDetails, Order } from "@/api/order.api";
+import ProtectedRoute from "@/components/RouteProtect";
 
 const orderConfirmation = () => {
   const router = useRouter();
@@ -260,4 +261,12 @@ const orderConfirmation = () => {
   );
 };
 
-export default orderConfirmation;
+const ProtectedOrderConfirmation = () => {
+  return (
+    <ProtectedRoute>
+      {orderConfirmation()}
+    </ProtectedRoute>
+  );
+};
+
+export default ProtectedOrderConfirmation;

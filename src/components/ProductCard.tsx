@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Heart, ShoppingCart } from "lucide-react";
 import { useWishlistStore } from "@/store/wishlistStore";
 import { useAuthStore } from "@/store/authStore";
+import { useCartStore } from "@/store/cartStore";
 import { getMinPrice, getDiscountedPrice, hasDiscount, type Product } from "@/api/Product.api";
 
 interface ProductCardProps {
@@ -18,6 +19,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   isMobile = false 
 }) => {
   const { isAuthenticated } = useAuthStore();
+  const { addToCart } = useCartStore();
   const { 
     addItem: addToWishlist, 
     removeItem: removeFromWishlist, 
@@ -27,6 +29,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const [wishlistLoading, setWishlistLoading] = useState(false);
   const [wishlistAnimating, setWishlistAnimating] = useState(false);
   const [wishlistError, setWishlistError] = useState("");
+  const [cartLoading, setCartLoading] = useState(false);
+  const [cartError, setCartError] = useState("");
 
   const minPrice = getMinPrice(product);
   const isDiscounted = hasDiscount(product);
@@ -69,6 +73,41 @@ const ProductCard: React.FC<ProductCardProps> = ({
     onProductClick(product.slug);
   };
 
+  const handleAddToCart = async (event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent navigation to product page
+    
+    if (!isAuthenticated) {
+      setCartError("Please login to add items to cart");
+      return;
+    }
+
+    if (cartLoading) return;
+    
+    setCartError("");
+    setCartLoading(true);
+    
+    try {
+      // Get the default variant SKU if product has variants
+      const variantSku = product.variants && product.variants.length > 0 
+        ? product.variants[0].sku 
+        : undefined;
+
+      await addToCart({
+        productId: product._id,
+        variantSku,
+        quantity: 1
+      });
+      
+      // Optional: Show success message
+      console.log("Product added to cart successfully");
+    } catch (error: any) {
+      setCartError(error?.message || "Failed to add item to cart");
+      console.error("Add to cart error:", error);
+    } finally {
+      setCartLoading(false);
+    }
+  };
+
   if (isMobile) {
     return (
       <div
@@ -105,8 +144,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
             <h3 className="font-medium text-gray-900 text-sm line-clamp-2 flex-1 mr-1">
               {product.name}
             </h3>
-            <button className="p-1 flex-shrink-0">
-              <ShoppingCart className="w-4 h-4 text-primary" />
+            <button 
+              className={`p-1 flex-shrink-0 transition-all duration-200 ${
+                cartLoading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'
+              }`}
+              onClick={handleAddToCart}
+              disabled={cartLoading}
+            >
+              <ShoppingCart className={`w-4 h-4 text-primary ${cartLoading ? 'animate-spin' : ''}`} />
             </button>
           </div>
           <p className="text-[10px] text-gray-500 mb-2 line-clamp-2">
@@ -170,8 +215,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <h3 className="font-medium text-gray-900 text-sm line-clamp-2 flex-1 mr-2">
             {product.name}
           </h3>
-          <button className="p-1 flex-shrink-0">
-            <ShoppingCart className="w-4 h-4 text-primary" />
+          <button 
+            className={`p-1 flex-shrink-0 transition-all duration-200 ${
+              cartLoading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'
+            }`}
+            onClick={handleAddToCart}
+            disabled={cartLoading}
+          >
+            <ShoppingCart className={`w-4 h-4 text-primary ${cartLoading ? 'animate-spin' : ''}`} />
           </button>
         </div>
         <p className="text-xs text-gray-500 line-clamp-2">
@@ -192,6 +243,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </>
           )}
         </div>
+        {cartError && (
+          <p className="text-xs text-red-500 mt-1">{cartError}</p>
+        )}
       </div>
     </div>
   );

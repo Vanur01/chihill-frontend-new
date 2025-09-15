@@ -3,9 +3,6 @@
 import React, { useState, useMemo, useEffect, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
-  ChevronDown,
-  Search,
-  Menu,
   ArrowLeft,
   Filter,
   X,

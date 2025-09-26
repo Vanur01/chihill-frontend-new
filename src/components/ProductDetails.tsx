@@ -37,6 +37,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({
   const [wishlistLoading, setWishlistLoading] = useState(false);
   const [wishlistAnimating, setWishlistAnimating] = useState(false);
   const [wishlistError, setWishlistError] = useState<string>("");
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const { user, isAuthenticated } = useAuthStore();
 
   // Product store
@@ -523,9 +524,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({
                         ? "fill-red-500 text-red-500"
                         : "text-gray-400 hover:text-red-500 hover:scale-105"
                     } ${
-                      wishlistLoading
-                        ? "animate-pulse scale-95 opacity-70"
-                        : ""
+                      wishlistLoading ? "animate-pulse scale-95 opacity-70" : ""
                     } 
                     ${wishlistAnimating ? "heart-pop" : ""}`}
                   />
@@ -860,16 +859,6 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({
                 <h4 className="font-semibold text-gray-900 text-sm mb-1">
                   INTERNATIONAL DELIVERY
                 </h4>
-                <p className="text-primary2 text-sm">
-                  Get your order in 2 days
-                </p>
-              </div>
-              <div className="bg-secondary1 rounded-lg p-4 text-center w-full">
-                <Award className="w-8 h-8 text-primary2 mx-auto mb-2" />
-                <h4 className="font-semibold text-gray-900 text-sm mb-1">
-                  PREMIUM MATERIAL
-                </h4>
-                <p className="text-primary2 text-sm">Premium Material</p>
               </div>
             </div>
 
@@ -878,9 +867,55 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({
               <h3 className="text-lg font-semibold text-gray-900 mb-3">
                 Description
               </h3>
-              <p className="text-gray-600 leading-relaxed">
-                {currentProduct.description}
-              </p>
+              <div className="text-gray-600 leading-relaxed">
+                <p 
+                  className={`transition-all duration-300 ${
+                    isDescriptionExpanded 
+                      ? 'max-h-none' 
+                      : 'max-h-12 overflow-hidden'
+                  }`}
+                  style={{
+                    display: '-webkit-box',
+                    WebkitLineClamp: isDescriptionExpanded ? 'none' : 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: isDescriptionExpanded ? 'visible' : 'hidden'
+                  }}
+                >
+                  {currentProduct.description}
+                </p>
+                {currentProduct.description && currentProduct.description.length > 150 && (
+                  <button
+                    onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                    className="mt-2 text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors flex items-center"
+                  >
+                    {isDescriptionExpanded ? (
+                      <>
+                        Show Less
+                        <svg 
+                          className="w-4 h-4 ml-1 transform transition-transform" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                        </svg>
+                      </>
+                    ) : (
+                      <>
+                        Read More
+                        <svg 
+                          className="w-4 h-4 ml-1 transform transition-transform" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Tags */}

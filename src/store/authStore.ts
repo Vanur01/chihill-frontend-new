@@ -6,6 +6,9 @@ export type AuthUser = {
   _id: string;
   mobile?: string;
   email?: string;
+  firstname?: string;
+  lastname?: string;
+  name?: string;
   recentlyViewedProducts?: string[];
   role: string;
   loginType?: string;

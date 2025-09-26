@@ -29,7 +29,18 @@ export interface Address {
 
 export interface Order {
   _id: string;
-  userId: string;
+  userId: string | {
+    _id: string;
+    mobile: string;
+    firstname?: string;
+    lastname?: string;
+    role: string;
+    loginType: string;
+    isEmailVerified: boolean;
+    isMobileVerified: boolean;
+    lastLogin: string;
+    recentlyViewedProducts?: string[];
+  };
   address: Address;
   orderId: string;
   transactionId?: string;

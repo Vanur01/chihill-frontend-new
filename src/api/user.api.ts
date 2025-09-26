@@ -23,6 +23,7 @@ export interface UserProfile {
 export interface UpdateProfileRequest {
   firstname?: string;
   lastname?: string;
+  email?: string;
 }
 
 // Get user profile

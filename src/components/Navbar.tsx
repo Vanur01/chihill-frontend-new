@@ -5,13 +5,64 @@ import Image from "next/image";
 import logo from "../../public/Logo.svg";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useRootCategories, useRootCategoryLoading, categoryStore } from "@/store/CategoryStore";
+import {
+  useRootCategories,
+  useRootCategoryLoading,
+  categoryStore,
+} from "@/store/CategoryStore";
+import { useAuthStore } from "@/store/authStore";
+import { useCartItemCount } from "@/store/cartStore";
 
-const NavIconButton = ({ href, active, children }: { href: string; active: boolean; children: React.ReactNode }) => {
+const NavIconButton = ({
+  href,
+  active,
+  children,
+}: {
+  href: string;
+  active: boolean;
+  children: React.ReactNode;
+}) => {
   return (
     <Link href={href}>
-      <button className={`p-2 transition-colors ${active ? "bg-[#FAE6EC] text-primary1 rounded-full" : "text-gray-600 hover:text-primary1"}`}>
+      <button
+        className={`p-2 transition-colors ${
+          active
+            ? "bg-[#FAE6EC] text-primary1 rounded-full"
+            : "text-gray-600 hover:text-primary1"
+        }`}
+      >
         {children}
+      </button>
+    </Link>
+  );
+};
+
+const CartIconWithBadge = ({
+  href,
+  active,
+  count,
+  size = "h-6 w-6",
+}: {
+  href: string;
+  active: boolean;
+  count: number;
+  size?: string;
+}) => {
+  return (
+    <Link href={href}>
+      <button
+        className={`relative p-2 transition-colors ${
+          active
+            ? "bg-[#FAE6EC] text-primary1 rounded-full"
+            : "text-gray-600 hover:text-primary1"
+        }`}
+      >
+        <ShoppingCart className={size} />
+        {count > 0 && (
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center min-w-[20px]">
+            {count > 99 ? '99+' : count}
+          </span>
+        )}
       </button>
     </Link>
   );
@@ -23,39 +74,64 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const pathname = usePathname();
   const router = useRouter();
+
+  // Get auth state
+  const { isAuthenticated, user, getCurrentUser } = useAuthStore();
   
+  // Get cart count
+  const cartItemCount = useCartItemCount();
+
   // Update CSS custom property for navbar height
   useEffect(() => {
     const updateNavbarHeight = () => {
-      const navbar = document.querySelector('nav');
+      const navbar = document.querySelector("nav");
       if (navbar) {
         const height = navbar.offsetHeight;
-        document.documentElement.style.setProperty('--navbar-height', `${height}px`);
+        document.documentElement.style.setProperty(
+          "--navbar-height",
+          `${height}px`
+        );
       }
     };
 
     // Update on mount and resize
     updateNavbarHeight();
-    window.addEventListener('resize', updateNavbarHeight);
-    
-    return () => window.removeEventListener('resize', updateNavbarHeight);
+    window.addEventListener("resize", updateNavbarHeight);
+
+    return () => window.removeEventListener("resize", updateNavbarHeight);
   }, [isMobileMenuOpen, isSearchOpen]); // Re-run when menu states change
-  
+
   // Get categories from store
   const rootCategories = useRootCategories();
   const isLoadingCategories = useRootCategoryLoading();
-  
+
   // Limit the number of categories to display in the navbar
   const displayedCategories = rootCategories.slice(0, 8); // Show max 8 categories
-  
+
   // Initialize categories when component mounts
   useEffect(() => {
     const initializeCategories = async () => {
       await categoryStore.fetchRoots();
     };
-    
+
     initializeCategories();
   }, []);
+
+  // Fetch current user when component mounts
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        await getCurrentUser();
+      } catch (error) {
+        console.log('Failed to fetch current user:', error);
+      }
+    };
+
+    // Only fetch if we think we're authenticated but don't have user data
+    if (isAuthenticated && !user) {
+      fetchCurrentUser();
+    }
+  }, [isAuthenticated, user, getCurrentUser]);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -66,15 +142,19 @@ const Navbar = () => {
   };
 
   const handleSearchSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && searchQuery.trim()) {
+    if (e.key === "Enter" && searchQuery.trim()) {
       router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery(""); // Clear the search after navigation
     }
   };
 
-  const handleMobileSearchSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-      router.push(`/search?q=${encodeURIComponent(e.currentTarget.value.trim())}`);
+  const handleMobileSearchSubmit = (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key === "Enter" && e.currentTarget.value.trim()) {
+      router.push(
+        `/search?q=${encodeURIComponent(e.currentTarget.value.trim())}`
+      );
       setIsSearchOpen(false); // Close mobile search
     }
   };
@@ -82,8 +162,8 @@ const Navbar = () => {
   return (
     <nav className="w-full bg-secondary sticky top-0 z-50 font-crimson-pro shadow-sm">
       <div className="px-4 sm:px-6 lg:px-8">
-  {/* Main Header */}
-  <div className="flex items-center justify-between md:justify-evenly h-[4.5rem] lg:h-[5.5rem]">
+        {/* Main Header */}
+        <div className="flex items-center justify-between md:justify-evenly h-[4.5rem] lg:h-[5.5rem]">
           {/* Logo */}
           <Link href={"/"} className="flex-shrink-0">
             <Image
@@ -115,24 +195,51 @@ const Navbar = () => {
 
           {/* Wishlist Icon */}
           <div className="hidden lg:block">
-            <NavIconButton href="/wishlist" active={!!pathname?.startsWith("/wishlist")}>
+            <NavIconButton
+              href="/wishlist"
+              active={!!pathname?.startsWith("/wishlist")}
+            >
               <Heart className="h-6 w-6" />
             </NavIconButton>
           </div>
 
           {/* Cart Icon */}
           <div className="hidden lg:block">
-            <NavIconButton href="/cart-details" active={!!(pathname?.startsWith("/cart") || pathname?.startsWith("/cart-details"))}>
-              <ShoppingCart className="h-6 w-6" />
-            </NavIconButton>
+            <CartIconWithBadge
+              href="/cart-details"
+              active={
+                !!(
+                  pathname?.startsWith("/cart") ||
+                  pathname?.startsWith("/cart-details")
+                )
+              }
+              count={cartItemCount}
+            />
           </div>
 
-          {/* Profile Icon */}
-          <div className="hidden lg:block">
-            <NavIconButton href="/profile" active={!!pathname?.startsWith("/profile")}>
+          {/* Profile Icon with Auth Status */}
+          <Link 
+            href={isAuthenticated ? "/profile" : "/auth/login"}
+            className="hidden lg:flex items-center space-x-2 hover:bg-gray-50 rounded-lg p-2 transition-colors cursor-pointer"
+          >
+            <div className={`p-2 transition-colors ${
+              pathname?.startsWith("/profile")
+                ? "bg-[#FAE6EC] text-primary1 rounded-full"
+                : "text-gray-600 hover:text-primary1"
+            }`}>
               <User className="h-6 w-6" />
-            </NavIconButton>
-          </div>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xs text-gray-600">
+                {isAuthenticated ? "Hey," : "Login"}
+              </span>
+              {isAuthenticated && user && (
+                <span className="text-sm font-medium text-gray-800 truncate max-w-20">
+                  {user.firstname || user.name || user.email?.split('@')[0] || user.mobile || "User"}
+                </span>
+              )}
+            </div>
+          </Link>
 
           {/* Talk to Designers Button */}
           <button className="hidden lg:block bg-red-900 text-white px-5 lg:px-6 py-2 lg:py-3 text-sm lg:text-base font-semibold tracking-wider hover:bg-red-800 transition-colors whitespace-nowrap">
@@ -150,17 +257,31 @@ const Navbar = () => {
             </button>
 
             <div className="hidden sm:block">
-              <NavIconButton href="/wishlist" active={!!pathname?.startsWith("/wishlist")}>
+              <NavIconButton
+                href="/wishlist"
+                active={!!pathname?.startsWith("/wishlist")}
+              >
                 <Heart className="h-5 sm:h-6 w-5 sm:w-6" />
               </NavIconButton>
             </div>
             <div className="hidden sm:block">
-              <NavIconButton href="/cart-details" active={!!(pathname?.startsWith("/cart") || pathname?.startsWith("/cart-details"))}>
-                <ShoppingCart className="h-5 sm:h-6 w-5 sm:w-6" />
-              </NavIconButton>
+              <CartIconWithBadge
+                href="/cart-details"
+                active={
+                  !!(
+                    pathname?.startsWith("/cart") ||
+                    pathname?.startsWith("/cart-details")
+                  )
+                }
+                count={cartItemCount}
+                size="h-5 sm:h-6 w-5 sm:w-6"
+              />
             </div>
             <div className="hidden sm:block">
-              <NavIconButton href="/profile" active={!!pathname?.startsWith("/profile")}>
+              <NavIconButton
+                href={isAuthenticated ? "/profile" : "/auth/login"}
+                active={!!pathname?.startsWith("/profile")}
+              >
                 <User className="h-5 sm:h-6 w-5 sm:w-6" />
               </NavIconButton>
             </div>
@@ -205,34 +326,41 @@ const Navbar = () => {
 
         {/* Desktop Navigation Menu */}
         <div className="hidden sm:block bg-secondary">
-            <div className="flex justify-evenly items-center space-x-7 lg:space-x-10 py-3 lg:py-4 lg:pb-8">
-              {isLoadingCategories ? (
-                // Show loading placeholders
-                Array(6).fill(0).map((_, index) => (
-                  <div key={index} className="h-4 w-20 bg-gray-200 animate-pulse rounded"></div>
+          <div className="flex justify-evenly items-center space-x-7 lg:space-x-10 py-3 lg:py-4 lg:pb-8">
+            {isLoadingCategories ? (
+              // Show loading placeholders
+              Array(6)
+                .fill(0)
+                .map((_, index) => (
+                  <div
+                    key={index}
+                    className="h-4 w-20 bg-gray-200 animate-pulse rounded"
+                  ></div>
                 ))
-              ) : displayedCategories.length > 0 ? (
-                // Show actual categories
-                displayedCategories.map((category) => (
-                  <Link
-                    key={category._id}
-                    href={`/categoryPage?slug=${category.slug}`}
-                    className="text-gray-700 hover:text-pink-600 font-medium text-sm lg:text-base tracking-wider transition-colors whitespace-nowrap"
-                  >
-                    {category.name.toUpperCase()}
-                  </Link>
-                ))
-              ) : (
-                // Fallback if no categories found
-                <div className="text-gray-500 text-sm">No categories available</div>
-              )}
-              <a
-                href="#"
-                className="bg-secondary1 text-gray-700 px-5 py-2 font-medium text-sm lg:text-base tracking-wider hover:bg-[#E8DFC5] transition-colors whitespace-nowrap rounded"
-              >
-                DESIGN YOURSELF
-              </a>
-            </div>
+            ) : displayedCategories.length > 0 ? (
+              // Show actual categories
+              displayedCategories.map((category) => (
+                <Link
+                  key={category._id}
+                  href={`/categoryPage?slug=${category.slug}`}
+                  className="text-gray-700 hover:text-pink-600 font-medium text-sm lg:text-base tracking-wider transition-colors whitespace-nowrap"
+                >
+                  {category.name.toUpperCase()}
+                </Link>
+              ))
+            ) : (
+              // Fallback if no categories found
+              <div className="text-gray-500 text-sm">
+                No categories available
+              </div>
+            )}
+            <a
+              href="#"
+              className="bg-secondary1 text-gray-700 px-5 py-2 font-medium text-sm lg:text-base tracking-wider hover:bg-[#E8DFC5] transition-colors whitespace-nowrap rounded"
+            >
+              DESIGN YOURSELF
+            </a>
+          </div>
         </div>
 
         {/* Mobile Navigation Menu Overlay */}
@@ -265,20 +393,31 @@ const Navbar = () => {
             {/* User Actions - Top Priority */}
             <div className="p-4 border-b border-gray-200 space-y-3">
               <Link
-                href="/profile"
+                href={isAuthenticated ? "/profile" : "/auth/login"}
                 className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-pink-600 hover:bg-gray-50 transition-colors rounded-lg"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 <User className="h-5 w-5" />
-                <span className="font-medium">My Account</span>
+                <span className="font-medium">
+                  {isAuthenticated ? "My Account" : "Login"}
+                </span>
               </Link>
               <Link
                 href="/cart-details"
                 className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-pink-600 hover:bg-gray-50 transition-colors rounded-lg"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                <ShoppingCart className="h-5 w-5" />
-                <span className="font-medium">Shopping Cart</span>
+                <div className="relative">
+                  <ShoppingCart className="h-5 w-5" />
+                  {cartItemCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center min-w-[16px]">
+                      {cartItemCount > 99 ? '99+' : cartItemCount}
+                    </span>
+                  )}
+                </div>
+                <span className="font-medium">
+                  Shopping Cart {cartItemCount > 0 && `(${cartItemCount})`}
+                </span>
               </Link>
               <Link
                 href="/wishlist"
@@ -292,14 +431,18 @@ const Navbar = () => {
 
             {/* Categories Section */}
             <div className="py-4">
-              <h3 className="px-4 text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Categories</h3>
+              <h3 className="px-4 text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                Categories
+              </h3>
               {isLoadingCategories ? (
                 // Show loading placeholders
-                Array(6).fill(0).map((_, index) => (
-                  <div key={index} className="px-4 py-1.5">
-                    <div className="h-4 w-28 bg-gray-200 animate-pulse rounded"></div>
-                  </div>
-                ))
+                Array(6)
+                  .fill(0)
+                  .map((_, index) => (
+                    <div key={index} className="px-4 py-1.5">
+                      <div className="h-4 w-28 bg-gray-200 animate-pulse rounded"></div>
+                    </div>
+                  ))
               ) : displayedCategories.length > 0 ? (
                 // Show actual categories
                 displayedCategories.map((category) => (
@@ -314,7 +457,9 @@ const Navbar = () => {
                 ))
               ) : (
                 // Fallback if no categories found
-                <div className="px-4 py-1.5 text-gray-500 text-sm">No categories available</div>
+                <div className="px-4 py-1.5 text-gray-500 text-sm">
+                  No categories available
+                </div>
               )}
             </div>
 
@@ -327,7 +472,7 @@ const Navbar = () => {
               >
                 DESIGN YOURSELF
               </a>
-              
+
               {/* Mobile Talk to Designers Button */}
               <a
                 href="#"

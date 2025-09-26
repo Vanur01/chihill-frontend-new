@@ -8,7 +8,7 @@ export default function ProfilePage(){
     <ProtectedRoute>
       <div className='bg-secondary min-h-screen'>
         <ProfileTabs />
-        <OrderHistory />
+        {/* <OrderHistory /> */}
       </div>
     </ProtectedRoute>
   )

@@ -103,7 +103,7 @@ const CreateAddressClient: React.FC<CreateAddressClientProps> = ({ addressId, on
         _id: "",
       });
       if (onSuccess) onSuccess();
-      router.push("/address");
+      router.push("/profile");
     } catch (err: any) {
       setSubmitError(err?.message || "Failed to save address");
     }

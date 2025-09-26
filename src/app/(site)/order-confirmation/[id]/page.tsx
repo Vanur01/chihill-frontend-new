@@ -89,8 +89,8 @@ const orderConfirmation = () => {
             </p>
           </div>
           <div className="lg:self-center">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 lg:text-right">
-              Order#{order.orderId}
+            <h2 className="text-xl lg:text-2xl font-bold text-gray-900 lg:text-right">
+              Ordsder#{order.orderId}
             </h2>
           </div>
         </div>

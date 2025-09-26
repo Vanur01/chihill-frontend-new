@@ -6,23 +6,28 @@ import saree1 from "../../../../public/saree_yellow.jpg";
 import logo from "../../../../public/Logo.svg";
 import ratha from "../../../../public/image.png";
 import flower from "../../../../public/flower.png";
-import { signInWithPopup } from "firebase/auth";
+import { signInWithPopup, GoogleAuthProvider, FacebookAuthProvider } from "firebase/auth";
 import { auth, googleProvider, facebookProvider } from "@/lib/FirebaseClient"; 
 import { loginWithFirebaseToken } from "@/api/auth.api";
 
 export default function SignupPage() {
 
 
-    const handleLogin = async (provider: any) => {
-    const result = await signInWithPopup(auth, provider);
-    const token = await result.user.getIdToken(); 
+    const handleLogin = async (provider: GoogleAuthProvider | FacebookAuthProvider) => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const token = await result.user.getIdToken();
 
-    const response = await loginWithFirebaseToken(token);
+      const response = await loginWithFirebaseToken(token);
+      console.log("Response from signup API:", response.data);
 
-    console.log("Response from signup API:", response.data);
-
-
-    console.log("User signed in:", result.user);
+      // Redirect to home page or dashboard after successful login
+      window.location.href = '/';
+    } catch (error: any) {
+      console.error("Login error:", error);
+      // Show error message to user
+      alert(error.message || "An error occurred during sign up. Please try again.");
+    }
   };
 
   return (

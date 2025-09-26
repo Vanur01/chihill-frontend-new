@@ -78,6 +78,7 @@ export default function UserProfile({ initialData }: UserProfileProps) {
       const updateData = {
         firstname: formData.firstName,
         lastname: formData.lastName,
+        email: formData.email,
       };
       
       const response = await updateUserProfile(updateData);
@@ -88,6 +89,7 @@ export default function UserProfile({ initialData }: UserProfileProps) {
         ...prev,
         firstName: updatedUser.firstname || "",
         lastName: updatedUser.lastname || "",
+        email: updatedUser.email || "",
       }));
       
       console.log("Profile updated successfully");
@@ -149,10 +151,10 @@ export default function UserProfile({ initialData }: UserProfileProps) {
               <input
                 type="email"
                 value={formData.email}
-                disabled
-                className="w-full px-4 py-3 bg-gray-100 border border-gray-300 text-gray-500 cursor-not-allowed"
+                onChange={(e) => handleInputChange("email", e.target.value)}
+                className="w-full px-4 py-3 bg-white border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                placeholder="Enter your email address"
               />
-              <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
             </div>
 
             {/* Mobile Number Field */}

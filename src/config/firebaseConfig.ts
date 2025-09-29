@@ -1,9 +1,9 @@
 export const firebaseConfig = {
-  apiKey: "AIzaSyDPGppjD0J4vvM_zWAsBaKMNP0vqgq5SNU",
-  authDomain: "chihili.firebaseapp.com",
-  projectId: "chihili",
-  storageBucket: "chihili.firebasestorage.app",
-  messagingSenderId: "1007295150020",
-  appId: "1:1007295150020:web:522cd0824fa562c1221691",
-  measurementId: "G-HHYXEXNK57",
+  apiKey: "AIzaSyDvqX5d_Mt813_qjJVEVVhaWkizIl100Vw",
+  authDomain: "chihili-92f01.firebaseapp.com",
+  projectId: "chihili-92f01",
+  storageBucket: "chihili-92f01.firebasestorage.app",
+  messagingSenderId: "870392136127",
+  appId: "1:870392136127:web:5aed50bdc60efe6199210a",
+  measurementId: "G-CT4NL0X1W2"
 };

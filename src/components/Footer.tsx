@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Facebook,
   Instagram,
@@ -9,8 +12,39 @@ import {
   Mail,
   Phone,
 } from "lucide-react";
+import { categoryAPI, type Category } from "@/api/category.api";
 
 export default function NewsletterFooter() {
+  const router = useRouter();
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+
+  // Fetch categories on component mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoadingCategories(true);
+        const response = await categoryAPI.getAllCategories({
+          limit: 5, // Only fetch 5 categories
+          isActive: true,
+          sort: 'name'
+        });
+        setCategories(response.data.categories);
+      } catch (error) {
+        console.error('Error fetching categories for footer:', error);
+        setCategories([]);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  // Handle category click navigation
+  const handleCategoryClick = (category: Category) => {
+    router.push(`/categoryPage?slug=${category.slug}`);
+  };
   return (
     <footer className="bg-secondary w-full">
       {/* Footer */}
@@ -34,36 +68,55 @@ export default function NewsletterFooter() {
           <div>
             <h4 className="font-semibold mb-2">Product</h4>
             <ul className="space-y-1">
-              <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
-                  Gown
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
-                  Fabric
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
-                  Co-Ord Sets
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
-                  Sarees
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
-                  Kurti Sets
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
-                  Skirt
-                </a>
-              </li>
+              {loadingCategories ? (
+                // Loading skeleton
+                Array.from({ length: 5 }).map((_, index) => (
+                  <li key={index}>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                  </li>
+                ))
+              ) : categories.length > 0 ? (
+                // Display fetched categories
+                categories.map((category) => (
+                  <li key={category._id}>
+                    <button
+                      onClick={() => handleCategoryClick(category)}
+                      className="hover:text-gray-900 transition-colors text-left w-full cursor-pointer"
+                    >
+                      {category.name}
+                    </button>
+                  </li>
+                ))
+              ) : (
+                // Fallback to hardcoded items if API fails
+                <>
+                  <li>
+                    <a href="#" className="hover:text-gray-900 transition-colors">
+                      Gown
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-gray-900 transition-colors">
+                      Fabric
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-gray-900 transition-colors">
+                      Co-Ord Sets
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-gray-900 transition-colors">
+                      Sarees
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="hover:text-gray-900 transition-colors">
+                      Kurti Sets
+                    </a>
+                  </li>
+                </>
+              )}
             </ul>
           </div>
 
@@ -72,24 +125,24 @@ export default function NewsletterFooter() {
             <h4 className="font-semibold mb-2">Company</h4>
             <ul className="space-y-1">
               <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
+                <Link href="/about-us" className="hover:text-gray-900 transition-colors">
                   About us
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
+                <Link href="/careers" className="hover:text-gray-900 transition-colors">
                   Careers
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
+                <Link href="/talk-to-designers" className="hover:text-gray-900 transition-colors">
                   Talk to Designers
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
+                <Link href="/contact-us" className="hover:text-gray-900 transition-colors">
                   Contact Us
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

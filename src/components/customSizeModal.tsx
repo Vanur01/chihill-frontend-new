@@ -135,7 +135,7 @@ const CustomSizeModal: React.FC<CustomSizeModalProps> = ({ onClose }) => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100%-5rem)]">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 ">
                 {/* Measurement inputs */}
                 <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto">
                   {measurementFields.map((field) => (

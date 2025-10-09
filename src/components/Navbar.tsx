@@ -256,6 +256,19 @@ const Navbar = () => {
               <Search className="h-5 w-5" />
             </button>
 
+            {/* Cart Icon - Always visible on mobile */}
+            <CartIconWithBadge
+              href="/cart-details"
+              active={
+                !!(
+                  pathname?.startsWith("/cart") ||
+                  pathname?.startsWith("/cart-details")
+                )
+              }
+              count={cartItemCount}
+              size="h-5 sm:h-6 w-5 sm:w-6"
+            />
+
             <div className="hidden sm:block">
               <NavIconButton
                 href="/wishlist"
@@ -263,19 +276,6 @@ const Navbar = () => {
               >
                 <Heart className="h-5 sm:h-6 w-5 sm:w-6" />
               </NavIconButton>
-            </div>
-            <div className="hidden sm:block">
-              <CartIconWithBadge
-                href="/cart-details"
-                active={
-                  !!(
-                    pathname?.startsWith("/cart") ||
-                    pathname?.startsWith("/cart-details")
-                  )
-                }
-                count={cartItemCount}
-                size="h-5 sm:h-6 w-5 sm:w-6"
-              />
             </div>
             <div className="hidden sm:block">
               <NavIconButton

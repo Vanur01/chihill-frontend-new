@@ -2,8 +2,20 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { CheckCircle, XCircle, X, Loader2, MapPin, Package } from "lucide-react";
-import { usePaymentStore, usePaymentLoading, usePaymentError, usePaymentActions } from "@/store/paymentStore";
+import {
+  CheckCircle,
+  XCircle,
+  X,
+  Loader2,
+  MapPin,
+  Package,
+} from "lucide-react";
+import {
+  usePaymentStore,
+  usePaymentLoading,
+  usePaymentError,
+  usePaymentActions,
+} from "@/store/paymentStore";
 import { getAddressById } from "@/api/address.api";
 import { getCartById } from "@/api/cart.api";
 import type { Address } from "@/api/address.api";
@@ -12,11 +24,11 @@ import type { Cart } from "@/api/cart.api";
 export const PaymentContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   // Get addressId and cartId from URL parameters
-  const addressId = searchParams.get('addressId');
-  const cartId = searchParams.get('cartId');
-  
+  const addressId = searchParams.get("addressId");
+  const cartId = searchParams.get("cartId");
+
   const [isProcessing, setIsProcessing] = useState(false);
   const [address, setAddress] = useState<Address | null>(null);
   const [cart, setCart] = useState<Cart | null>(null);
@@ -30,20 +42,20 @@ export const PaymentContent = () => {
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Additional state for cart details that might not be in the type
   const [shippingCharge, setShippingCharge] = useState<number>(0);
-  
+
   const paymentLoading = usePaymentLoading();
   const paymentError = usePaymentError();
   const { initiatePayment } = usePaymentActions();
-  
+
   // Fetch address and cart data
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
-      
+
       try {
         // Fetch address data
         if (addressId) {
@@ -52,33 +64,35 @@ export const PaymentContent = () => {
             if (addressResponse.success) {
               setAddress(addressResponse.data.address);
             } else {
-              throw new Error(addressResponse.message || 'Failed to fetch address');
+              throw new Error(
+                addressResponse.message || "Failed to fetch address"
+              );
             }
           } catch (addressError: any) {
             console.error("Address fetch error:", addressError);
             setError(`Address error: ${addressError.message}`);
           }
         }
-        
+
         // Fetch cart data
         if (cartId) {
           try {
             // Add cache busting parameter to avoid 304 Not Modified
             const timestamp = new Date().getTime();
             // Use a clean URL structure for the API call
-            const cleanCartId = cartId.split('?')[0]; // Remove any existing query params
+            const cleanCartId = cartId.split("?")[0]; // Remove any existing query params
             const response = await getCartById(`${cleanCartId}?_=${timestamp}`);
-            
+
             console.log("Cart API Response:", response); // Debug log
-            
+
             // The API should return the success response with cart data
             if (response.success && response.data) {
               const cartData = response.data.cart;
               const summaryData = response.data.summary;
-              
+
               if (cartData) {
                 setCart(cartData);
-                
+
                 // Set cart summary
                 if (summaryData) {
                   setCartSummary(summaryData);
@@ -88,67 +102,82 @@ export const PaymentContent = () => {
                   const cartItems = cartData.items || [];
                   const calculatedSummary = {
                     itemCount: cartItems.length,
-                    subtotal: cartItems.reduce((sum: number, item: any) => sum + (item.priceAtAdd * item.quantity), 0),
+                    subtotal: cartItems.reduce(
+                      (sum: number, item: any) =>
+                        sum + item.priceAtAdd * item.quantity,
+                      0
+                    ),
                     discount: 0,
-                    total: cartItems.reduce((sum: number, item: any) => sum + (item.priceAtAdd * item.quantity), 0),
-                    items: cartItems.reduce((sum: number, item: any) => sum + item.quantity, 0)
+                    total: cartItems.reduce(
+                      (sum: number, item: any) =>
+                        sum + item.priceAtAdd * item.quantity,
+                      0
+                    ),
+                    items: cartItems.reduce(
+                      (sum: number, item: any) => sum + item.quantity,
+                      0
+                    ),
                   };
                   setCartSummary(calculatedSummary);
                   console.log("Calculated Summary:", calculatedSummary); // Debug log
                 }
-                
+
                 // Set shipping charge - free over 1000
                 const subtotal = summaryData?.subtotal || 0;
                 setShippingCharge(subtotal > 1000 ? 0 : 50);
               } else {
                 console.error("No cart data in response:", response); // Debug log
-                throw new Error('Cart data not found in response');
+                throw new Error("Cart data not found in response");
               }
             } else {
               console.error("Invalid response:", response); // Debug log
-              throw new Error(response.message || 'Invalid response from server');
+              throw new Error(
+                response.message || "Invalid response from server"
+              );
             }
           } catch (cartError: any) {
             console.error("Cart fetch error:", cartError); // Debug log
-            setError(`Cart error: ${cartError.message || 'Failed to fetch cart data'}`);
+            setError(
+              `Cart error: ${cartError.message || "Failed to fetch cart data"}`
+            );
           }
         }
-        
+
         setLoading(false);
       } catch (err: any) {
         console.error("General fetch error:", err);
-        setError(err.message || 'Failed to load data');
+        setError(err.message || "Failed to load data");
         setLoading(false);
       }
     };
-    
+
     if (addressId || cartId) {
       fetchData();
     } else {
       setLoading(false);
     }
   }, [addressId, cartId]);
-  
+
   // Redirect if addressId is missing
   useEffect(() => {
     if (!addressId && !loading) {
-      router.push('/address');
+      router.push("/address");
     }
   }, [addressId, router, loading]);
 
   const handlePayment = () => {
     if (!addressId) {
-      alert('Please select a delivery address first');
-      router.push('/address');
+      alert("Please select a delivery address first");
+      router.push("/address");
       return;
     }
-    
+
     if (!cartId) {
-      alert('No cart found. Please add items to your cart first.');
-      router.push('/');
+      alert("No cart found. Please add items to your cart first.");
+      router.push("/");
       return;
     }
-    
+
     // Process payment directly with success status
     processPayment(true);
   };
@@ -159,41 +188,47 @@ export const PaymentContent = () => {
       setIsProcessing(true);
       setTimeout(() => {
         setIsProcessing(false);
-        
+
         const orderParams = new URLSearchParams({
-          status: 'failed',
+          status: "failed",
           orderId: `ORD${Date.now()}`,
           amount: cartSummary?.total.toString() || "0",
           ...(addressId ? { addressId } : {}),
-          ...(cartId ? { cartId } : {})
+          ...(cartId ? { cartId } : {}),
         });
-        
+
         router.push(`/order-success?${orderParams.toString()}`);
       }, 2000);
       return;
     }
-    
+
     // For success, actually call the API
     setIsProcessing(true);
-    
+
     try {
       // Call the payment API
       const paymentUrl = await initiatePayment({
         cartId: cartId!,
-        addressId: addressId!
+        addressId: addressId!,
       });
-      
+
       setIsProcessing(false);
-      
+
       if (paymentUrl) {
         // Redirect to the payment gateway
-        window.location.href = paymentUrl;
+        const link = document.createElement("a");
+        link.href = paymentUrl;
+        link.target = "_self";
+        link.rel = "noopener noreferrer";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
       } else {
-        throw new Error('Failed to get payment URL');
+        throw new Error("Failed to get payment URL");
       }
     } catch (err: any) {
       setIsProcessing(false);
-      alert(err.message || 'Payment initiation failed');
+      alert(err.message || "Payment initiation failed");
     }
   };
 
@@ -213,7 +248,7 @@ export const PaymentContent = () => {
               <h2 className="text-md lg:text-xl items-center font-light tracking-[0.1rem] sm:tracking-[0.2rem] mb-3 sm:mb-6 text-start font-crimson-pro">
                 CART SUMMARY
               </h2>
-              
+
               {loading ? (
                 <div className="flex justify-center items-center py-8">
                   <Loader2 className="w-8 h-8 text-primary1 animate-spin" />
@@ -226,7 +261,9 @@ export const PaymentContent = () => {
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between border-b border-secondary1 pb-3">
                     <span className="text-zinc-800">Subtotal</span>
-                    <span className="font-medium">₹{cartSummary.subtotal.toFixed(2)}</span>
+                    <span className="font-medium">
+                      ₹{cartSummary.subtotal.toFixed(2)}
+                    </span>
                   </div>
 
                   <div className="flex justify-between items-center border-b border-secondary1 pb-3">
@@ -236,7 +273,9 @@ export const PaymentContent = () => {
                         ?
                       </div>
                     </div>
-                    <span className="font-medium">₹{shippingCharge.toFixed(2)}</span>
+                    <span className="font-medium">
+                      ₹{shippingCharge.toFixed(2)}
+                    </span>
                   </div>
 
                   <div className="flex justify-between border-b border-secondary1 pb-3">
@@ -253,12 +292,21 @@ export const PaymentContent = () => {
                         ?
                       </div>
                     </div>
-                    <span className="font-medium">₹{(cartSummary.subtotal * 0.18).toFixed(2)}</span>
+                    <span className="font-medium">
+                      ₹{(cartSummary.subtotal * 0.18).toFixed(2)}
+                    </span>
                   </div>
 
                   <div className="flex justify-between text-lg font-medium">
                     <span>Total Payable</span>
-                    <span>₹{(cartSummary.total + shippingCharge + (cartSummary.subtotal * 0.18)).toFixed(2)}</span>
+                    <span>
+                      ₹
+                      {(
+                        cartSummary.total +
+                        shippingCharge +
+                        cartSummary.subtotal * 0.18
+                      ).toFixed(2)}
+                    </span>
                   </div>
                 </div>
               ) : (
@@ -286,42 +334,68 @@ export const PaymentContent = () => {
                 <div className="space-y-4">
                   {cart.items.map((item, index) => {
                     // Handle the nested structure where productId can be an object
-                    const product = typeof item.productId !== 'string' ? item.productId : null;
-                    const variant = product?.variants?.find((v: any) => v.sku === item.variantSku) || null;
-                    const productId = typeof item.productId !== 'string' ? item.productId._id : item.productId;
-                    
+                    const product =
+                      typeof item.productId !== "string"
+                        ? item.productId
+                        : null;
+                    const variant =
+                      product?.variants?.find(
+                        (v: any) => v.sku === item.variantSku
+                      ) || null;
+                    const productId =
+                      typeof item.productId !== "string"
+                        ? item.productId._id
+                        : item.productId;
+
                     return (
-                      <div key={`${productId}-${item.variantSku || ''}-${index}`} className="flex gap-4">
+                      <div
+                        key={`${productId}-${item.variantSku || ""}-${index}`}
+                        className="flex gap-4"
+                      >
                         <div className="flex items-center justify-center">
                           <img
-                            src={product?.images && product.images.length > 0 
-                              ? product.images[0] 
-                              : variant?.images && variant.images.length > 0 
-                                ? variant.images[0] 
-                                : "/best1.jpg"}
+                            src={
+                              product?.images && product.images.length > 0
+                                ? product.images[0]
+                                : variant?.images && variant.images.length > 0
+                                ? variant.images[0]
+                                : "/best1.jpg"
+                            }
                             alt={product?.name || "Product"}
                             className="w-20 h-25 object-cover"
                           />
                         </div>
                         <div className="flex-1">
                           <h3 className="font-medium text-gray-800">
-                            {product?.name || "Product"} 
+                            {product?.name || "Product"}
                             {variant && variant.title && ` (${variant.title})`}
                           </h3>
-                          <p className="text-sm mt-1">Quantity: {item.quantity}</p>
+                          <p className="text-sm mt-1">
+                            Quantity: {item.quantity}
+                          </p>
                           {variant && variant.attributes && (
                             <p className="text-sm text-gray-600">
-                              {variant.attributes.size && `Size: ${variant.attributes.size}`}
-                              {variant.attributes.color && variant.attributes.size && ' • '}
-                              {variant.attributes.color && `Color: ${variant.attributes.color}`}
+                              {variant.attributes.size &&
+                                `Size: ${variant.attributes.size}`}
+                              {variant.attributes.color &&
+                                variant.attributes.size &&
+                                " • "}
+                              {variant.attributes.color &&
+                                `Color: ${variant.attributes.color}`}
                             </p>
                           )}
                         </div>
                         <div className="text-right">
-                          <span className="font-semibold text-lg">₹{item.priceAtAdd.toFixed(2)}</span>
-                          {variant && variant.mrp && variant.mrp > item.priceAtAdd && (
-                            <p className="text-sm line-through text-gray-500">₹{variant.mrp.toFixed(2)}</p>
-                          )}
+                          <span className="font-semibold text-lg">
+                            ₹{item.priceAtAdd.toFixed(2)}
+                          </span>
+                          {variant &&
+                            variant.mrp &&
+                            variant.mrp > item.priceAtAdd && (
+                              <p className="text-sm line-through text-gray-500">
+                                ₹{variant.mrp.toFixed(2)}
+                              </p>
+                            )}
                         </div>
                       </div>
                     );
@@ -341,7 +415,7 @@ export const PaymentContent = () => {
               <h2 className="text-md lg:text-xl items-center font-light tracking-[0.1rem] sm:tracking-[0.2rem] mb-6 text-start font-crimson-pro">
                 DELIVERY ADDRESS
               </h2>
-              
+
               {loading ? (
                 <div className="flex justify-center items-center py-8">
                   <Loader2 className="w-8 h-8 text-primary1 animate-spin" />
@@ -357,16 +431,19 @@ export const PaymentContent = () => {
                     <div>
                       <p className="font-medium">{address.name}</p>
                       <p className="text-sm text-gray-600 mt-1">
-                        {address.street}, {address.landmark && `${address.landmark}, `}
+                        {address.street},{" "}
+                        {address.landmark && `${address.landmark}, `}
                         {address.city}, {address.state} - {address.postalCode}
                       </p>
-                      <p className="text-sm text-gray-600 mt-1">Phone: {address.phone}</p>
+                      <p className="text-sm text-gray-600 mt-1">
+                        Phone: {address.phone}
+                      </p>
                     </div>
                   </div>
-                  
+
                   <div className="bg-secondary p-3 text-sm my-4 rounded">
                     <p className="flex items-center text-secondary2">
-                      <Package className="w-4 h-4 mr-2" /> 
+                      <Package className="w-4 h-4 mr-2" />
                       Delivery expected in 3-5 business days
                     </p>
                   </div>
@@ -374,15 +451,15 @@ export const PaymentContent = () => {
               ) : (
                 <div className="text-center py-4 mb-6">
                   <p>No address selected. Please select a delivery address.</p>
-                  <button 
-                    onClick={() => router.push('/address')}
+                  <button
+                    onClick={() => router.push("/address")}
                     className="mt-4 px-4 py-2 bg-primary1 text-white rounded-md"
                   >
                     Add Address
                   </button>
                 </div>
               )}
-              
+
               {/* <div className="bg-secondary border border-secondary1 p-4 mb-6">
                 <p className="text-md">
                   Your order is eligible for{" "}
@@ -392,7 +469,7 @@ export const PaymentContent = () => {
                 </p>
               </div> */}
 
-              <button 
+              <button
                 onClick={handlePayment}
                 disabled={paymentLoading || isProcessing || !address || !cart}
                 className="w-full mt-4 bg-primary1 hover:bg-primary2 text-white font-medium py-3 px-6 transition-colors cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
@@ -413,5 +490,3 @@ export const PaymentContent = () => {
     </div>
   );
 };
-
-

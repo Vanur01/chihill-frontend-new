@@ -256,12 +256,13 @@ const CustomSizeModal: React.FC<CustomSizeModalProps> = ({ onClose }) => {
                   </div>
                 </div>
                 <div className="bg-gray-50 rounded-lg overflow-hidden">
-                  <iframe
+                  <video
                     className="w-full h-full min-h-[300px]"
-                    src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-                    title="How to Take Body Measurements"
-                    allowFullScreen
-                  ></iframe>
+                    controls
+                    preload="metadata"
+                  >
+                    <source src="/video/measurement.mp4" type="video/mp4" />
+                  </video>
                 </div>
               </div>
             </div>

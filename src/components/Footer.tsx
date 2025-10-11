@@ -53,11 +53,11 @@ export default function NewsletterFooter() {
           {/* Brand */}
           <div className="flex flex-col items-start justify-start">
             <Image
-              src={"/Logo.svg"}
+              src={"/Logo.png"}
               alt="Chihili Logo"
               width={120}
-              height={40}
-              className="h-10 mb-4"
+              height={120}
+              className="h-20 w-auto mb-4"
             />
             <p className="text-gray-600 text-sm ml-3">
               Join the Odia Fashion Heritage

@@ -111,7 +111,7 @@ const CategoryPageContent = () => {
   const [filters, setFilters] = useState<ClothingFilters>({
     categories: [],
     colors: [],
-    priceRange: [100, 50000],
+    priceRange: [1, 50000],
     discount: "0% and above",
     sortBy: "popularity",
   });
@@ -299,7 +299,7 @@ const CategoryPageContent = () => {
     setFilters({
       categories: [],
       colors: [],
-      priceRange: [100, 50000],
+      priceRange: [1, 50000],
       discount: "0% and above",
       sortBy: "popularity",
     });
@@ -322,7 +322,7 @@ const CategoryPageContent = () => {
   const activeFilterCount = useMemo(() => {
     return filters.categories.length + 
            filters.colors.length + 
-           (filters.priceRange[0] !== 100 || filters.priceRange[1] !== 50000 ? 1 : 0) +
+           (filters.priceRange[0] !== 1 || filters.priceRange[1] !== 50000 ? 1 : 0) +
            (filters.discount !== "0% and above" ? 1 : 0);
   }, [filters]);
 

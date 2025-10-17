@@ -57,11 +57,43 @@ const ShoppingCart = () => {
     }
   }, [user?._id, fetchUserCarts]);
 
-  // Get cart data for summary
+  // Get cart data for summary and calculate GST
   const subtotal = useMemo(() => summary?.subtotal ?? 0, [summary]);
   const shippingEstimate = 0.00;
-  const taxEstimate = 0.00;
-  const cartTotal = useMemo(() => summary?.total ?? subtotal, [summary, subtotal]);
+  
+  // Calculate GST based on government rules for each item
+  const gstCalculation = useMemo(() => {
+    let totalGST = 0;
+    let subtotalBeforeGST = 0;
+    let hasHighValueItems = false;
+    
+    items.forEach(item => {
+      const itemPrice = item.priceAtAdd || 0;
+      const itemTotal = itemPrice * item.quantity;
+      
+      if (itemTotal > 2500) {
+        hasHighValueItems = true;
+      }
+      
+      // Always use 5% GST rate (Option 2 for high-value items)
+      const gstRate = 5;
+      const priceBeforeGST = itemTotal / (1 + gstRate / 100);
+      const gstAmount = itemTotal - priceBeforeGST;
+      
+      subtotalBeforeGST += priceBeforeGST;
+      totalGST += gstAmount;
+    });
+    
+    return {
+      subtotalBeforeGST,
+      totalGST,
+      hasHighValueItems,
+      effectiveGSTRate: 5
+    };
+  }, [items]);
+  
+  const taxEstimate = gstCalculation.totalGST;
+  const cartTotal = useMemo(() => gstCalculation.subtotalBeforeGST + gstCalculation.totalGST, [gstCalculation]);
   
   const handleCheckout = () => {
     // Get cartId from the store's cart object
@@ -180,16 +212,42 @@ const ShoppingCart = () => {
                     <div className="flex-1">
                       {/* Name and Price Row */}
                       <div className="flex justify-between items-start mb-2 sm:mb-6">
-                        <h3 className="text-sm sm:text-xl font-light font-lato">
-                          {item.productId === null ? (
-                            <span className="text-red-500">Product No Longer Available</span>
-                          ) : (
-                            (typeof item.productId !== 'string' && item.productId?.name) || 'Unknown Product'
-                          )}
-                        </h3>
-                        <p className="text-sm sm:text-xl font-bold font-lato">
-                          ₹{typeof item.priceAtAdd === 'number' ? item.priceAtAdd.toFixed(2) : '0.00'}
-                        </p>
+                        <div className="flex-1 pr-2">
+                          <h3 className="text-sm sm:text-xl font-light font-lato">
+                            {item.productId === null ? (
+                              <span className="text-red-500">Product No Longer Available</span>
+                            ) : (
+                              (typeof item.productId !== 'string' && item.productId?.name) || 'Unknown Product'
+                            )}
+                          </h3>
+                          {(() => {
+                            const itemPrice = item.priceAtAdd || 0;
+                            const itemTotal = itemPrice * item.quantity;
+                            const gstRate = 5; // Always 5% effective rate
+                            const priceBeforeGST = itemTotal / (1 + gstRate / 100);
+                            const gstAmount = itemTotal - priceBeforeGST;
+                            
+                            return (
+                              <div className="text-xs text-gray-600 mt-1">
+                                <div>Price: ₹{priceBeforeGST.toFixed(2)} + GST ₹{gstAmount.toFixed(2)}</div>
+                                {itemTotal > 2500 && (
+                                  <div className="text-blue-600">GST @ 5% (Split Method)</div>
+                                )}
+                                {itemTotal <= 2500 && (
+                                  <div className="text-green-600">GST @ 5% (Standard)</div>
+                                )}
+                              </div>
+                            );
+                          })()}
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm sm:text-xl font-bold font-lato">
+                            ₹{typeof item.priceAtAdd === 'number' ? item.priceAtAdd.toFixed(2) : '0.00'}
+                          </p>
+                          <p className="text-xs text-gray-500 font-lato">
+                            per item (Inc. GST)
+                          </p>
+                        </div>
                       </div>
 
                       {/* Variant title if present */}
@@ -276,39 +334,42 @@ const ShoppingCart = () => {
 
               <div className="space-y-7 sm:space-y-4 mb-3 sm:mb-6">
                 <div className="flex justify-between items-center py-1 sm:py-2 border-b border-secondary1">
-                  <span className="text-sm sm:text-base text-gray-600 font-lato">Subtotal</span>
+                  <span className="text-sm sm:text-base text-gray-600 font-lato">Subtotal (Before GST)</span>
                   <span className="text-sm sm:text-base font-medium font-lato">
-                    ₹{subtotal.toFixed(2)}
+                    ₹{gstCalculation.subtotalBeforeGST.toFixed(2)}
                   </span>
                 </div>
 
+             
                 <div className="flex justify-between items-center py-1 sm:py-2 border-b border-secondary1">
                   <div className="flex items-center gap-1 sm:gap-2">
-                    <span className="text-sm sm:text-base text-gray-600 font-lato">
-                      Shipping estimate
-                    </span>
+                    <div className="flex flex-col">
+                      <span className="text-sm sm:text-base text-gray-600 font-lato">
+                        GST @ {gstCalculation.effectiveGSTRate}%
+                      </span>
+                      {gstCalculation.hasHighValueItems && (
+                        <span className="text-xs text-blue-600 font-lato">(Split Method Applied)</span>
+                      )}
+                    </div>
                     <Info className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
                   </div>
                   <span className="text-sm sm:text-base font-medium font-lato">
-                    ₹{shippingEstimate.toFixed(2)}
+                    ₹{gstCalculation.totalGST.toFixed(2)}
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center py-1 sm:py-2 border-b border-secondary1">
-                  <div className="flex items-center gap-1 sm:gap-2">
-                    <span className="text-sm sm:text-base text-gray-600 font-lato">
-                      Tax estimate
-                    </span>
-                    <Info className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
+                {gstCalculation.hasHighValueItems && (
+                  <div className="bg-blue-50 p-2 sm:p-3 rounded-md border border-blue-200 -mx-1 sm:-mx-0">
+                    <p className="text-xs font-medium text-blue-800 mb-1">GST Optimization Applied</p>
+                    <p className="text-xs text-blue-700">
+                      Items {`>`} ₹2,500: Split into fabric + stitching components @ 5% each (instead of 18%)
+                    </p>
                   </div>
-                  <span className="text-sm sm:text-base font-medium font-lato">
-                    ₹{taxEstimate.toFixed(2)}
-                  </span>
-                </div>
+                )}
 
                 <div className="flex justify-between items-center">
                   <span className="text-sm sm:text-lg font-medium font-lato">
-                    Order total
+                    Order total (Inc. GST)
                   </span>
                   <span className="text-sm sm:text-xl font-semibold font-lato">
                     ₹{cartTotal.toFixed(2)}

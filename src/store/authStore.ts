@@ -81,7 +81,8 @@ export const useAuthStore = create<AuthState>()((set,get) => ({
       // Optionally fetch fresh user data from /me endpoint
       // This ensures we have the most up-to-date user information
         await get().getCurrentUser();
-    } catch {
+    } catch (error: any) {
+      console.error('Token refresh failed:', error);
       set({ user: null, token: null, isAuthenticated: false });
       throw new Error('Token refresh failed');
     } finally {

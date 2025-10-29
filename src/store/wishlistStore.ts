@@ -44,7 +44,7 @@ export const useWishlistStore = create<WishlistStore>((set, get) => ({
         const wishlistItems = response.data.items || [];
         set({ 
           items: wishlistItems,
-          itemIds: wishlistItems.map((item: WishlistItem) => item._id)
+          itemIds: wishlistItems.map((item: WishlistItem) => item._id) || []
         });
       }
     } catch (error: any) {
@@ -56,7 +56,7 @@ export const useWishlistStore = create<WishlistStore>((set, get) => ({
 
   addItem: async (productId: string) => {
     // Optimistic update - immediately add to UI
-    const previousItemIds = get().itemIds;
+    const previousItemIds = get().itemIds || []; // Ensure previousItemIds is always an array
     const isAlreadyInWishlist = previousItemIds.includes(productId);
     
     if (isAlreadyInWishlist) {
@@ -98,7 +98,7 @@ export const useWishlistStore = create<WishlistStore>((set, get) => ({
 
   removeItem: async (productId: string) => {
     // Optimistic update - immediately remove from UI
-    const previousItemIds = get().itemIds;
+    const previousItemIds = get().itemIds || []; // Ensure previousItemIds is always an array
     const isInWishlist = previousItemIds.includes(productId);
     
     if (!isInWishlist) {
@@ -141,14 +141,14 @@ export const useWishlistStore = create<WishlistStore>((set, get) => ({
   setWishlistItems: (items: WishlistItem[]) => {
     set({ 
       items,
-      itemIds: items.map(item => item._id)
+      itemIds: items.map(item => item._id) || [] // Ensure itemIds is always an array
     });
   },
 
   setWishlistIds: async (ids: string[]) => {
-    set({ itemIds: ids });
+    set({ itemIds: ids || [] }); // Ensure itemIds is always an array
     // If we only have IDs and need full items, we should fetch them
-    if (ids.length > 0 && get().items.length === 0) {
+    if ((ids || []).length > 0 && get().items.length === 0) {
       try {
         await get().fetchWishlist();
       } catch (error) {
@@ -158,6 +158,7 @@ export const useWishlistStore = create<WishlistStore>((set, get) => ({
   },
 
   isInWishlist: (productId: string) => {
-    return get().itemIds.includes(productId);
+    const itemIds = get().itemIds || []; // Ensure itemIds is always an array
+    return itemIds.includes(productId);
   },
 }));

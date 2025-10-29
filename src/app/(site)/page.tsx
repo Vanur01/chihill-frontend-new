@@ -24,7 +24,7 @@ export default function Home() {
       <NewCollectionGrid />
       <BestSellingCarousel />
       <DraggableCarousel />
-      <Poster />
+      {/* <Poster /> */}
     </div>
   );
 }

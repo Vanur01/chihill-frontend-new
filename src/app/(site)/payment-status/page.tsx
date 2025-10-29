@@ -322,9 +322,18 @@ function OrderSuccessContent() {
                       // Check if we have actual order/cart items from paymentStatus
                       const orderData = paymentStatus?.data;
                       const paymentData = paymentStatus?.payment;
-                      const actualItems = paymentData?.products || (orderData as any)?.items || [];
                       
-                      if (actualItems.length > 0) {
+                      // Ensure actualItems is always an array
+                      let actualItems: any[] = [];
+                      if (Array.isArray(paymentData?.products)) {
+                        actualItems = paymentData.products;
+                      } else if (Array.isArray((orderData as any)?.items)) {
+                        actualItems = (orderData as any).items;
+                      } else {
+                        actualItems = [];
+                      }
+                      
+                      if (Array.isArray(actualItems) && actualItems.length > 0) {
                         // Display actual purchased items
                         return actualItems.map((item: any, index: number) => {
                           const itemPrice = item.priceAtAdd || item.price || item.amount || 0;
@@ -421,14 +430,23 @@ function OrderSuccessContent() {
                   // Get actual items for detailed calculation
                   const orderData = paymentStatus?.data;
                   const paymentData = paymentStatus?.payment;
-                  const actualItems = paymentData?.products || (orderData as any)?.items || [];
+                  
+                  // Ensure actualItems is always an array
+                  let actualItems: any[] = [];
+                  if (Array.isArray(paymentData?.products)) {
+                    actualItems = paymentData.products;
+                  } else if (Array.isArray((orderData as any)?.items)) {
+                    actualItems = (orderData as any).items;
+                  } else {
+                    actualItems = [];
+                  }
                   
                   let totalSubtotalBeforeGST = 0;
                   let totalGSTAmount = 0;
                   let totalAmount = orderDetails?.amount || 0;
                   let hasHighValueItems = false;
                   
-                  if (actualItems.length > 0) {
+                  if (Array.isArray(actualItems) && actualItems.length > 0) {
                     // Calculate from actual items
                     actualItems.forEach((item: any) => {
                       const itemPrice = item.priceAtAdd || item.price || item.amount || 0;

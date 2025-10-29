@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useHomeStore } from '@/store/homeStore';
-import { Category } from '@/api/home.api';
 
 export default function FashionCategories() {
   const router = useRouter();

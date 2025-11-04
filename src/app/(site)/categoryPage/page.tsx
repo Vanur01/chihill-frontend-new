@@ -13,6 +13,7 @@ import ProductCard from "@/components/ProductCard";
 import FilterSidebar from "@/components/FilterSidebar";
 import MobileFilterModal from "@/components/MobileFilterModal";
 import MobileSortModal from "@/components/MobileSortModal";
+import ChihiliLoader from "@/components/ChihiliLoader";
 
 // Optimized store imports
 import { useCategories, useCategoryLoading, categoryStore } from "@/store/CategoryStore";
@@ -71,36 +72,7 @@ const CategoryPage = () => {
 
 // Loading skeleton component
 const CategoryPageSkeleton = () => {
-  return (
-    <div className="min-h-screen bg-white">
-      <div className="hidden lg:block my-8">
-        <div className="px-12 mx-auto flex gap-6">
-          {/* Desktop skeleton */}
-          <div className="w-64 space-y-4">
-            <div className="h-8 bg-gray-200 rounded animate-pulse"></div>
-            <div className="h-32 bg-gray-200 rounded animate-pulse"></div>
-            <div className="h-24 bg-gray-200 rounded animate-pulse"></div>
-          </div>
-          <div className="flex-1">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {[...Array(8)].map((_, i) => (
-                <div key={i} className="h-80 bg-gray-200 rounded animate-pulse"></div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-      {/* Mobile skeleton */}
-      <div className="block lg:hidden p-4">
-        <div className="h-6 bg-gray-200 rounded animate-pulse mb-4"></div>
-        <div className="grid grid-cols-2 gap-4">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-64 bg-gray-200 rounded animate-pulse"></div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+  return <ChihiliLoader message="Loading products..." />;
 };
 
 const CategoryPageContent = () => {
@@ -402,7 +374,7 @@ const CategoryPageContent = () => {
 
             {productLoading && (
               <div className="flex justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                <ChihiliLoader size="sm" message="Loading more products..." />
               </div>
             )}
 
@@ -481,7 +453,7 @@ const CategoryPageContent = () => {
 
           {productLoading && (
             <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+              <ChihiliLoader size="sm" message="Loading more products..." />
             </div>
           )}
         </div>

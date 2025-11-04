@@ -97,15 +97,6 @@ const Carousel = () => {
     setIsAutoPlaying(true);
   };
 
-  // Show loading state
-  if (loadingHeroBanners) {
-    return (
-      <div className="relative w-full h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px] xl:h-[800px] overflow-hidden bg-black/10 flex items-center justify-center">
-        <div className="text-lg text-gray-600">Loading banners...</div>
-      </div>
-    );
-  }
-
   return (
     <div
       className="relative w-full h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px] xl:h-[800px] overflow-hidden bg-black"

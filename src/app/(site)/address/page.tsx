@@ -1,19 +1,13 @@
 import React, { Suspense } from "react";
 import { AddressConent } from "./AddressContent";
 import ProtectedRoute from "@/components/RouteProtect";
-import { Loader } from "lucide-react";
+import ChihiliLoader from "@/components/ChihiliLoader";
 
 const AddressPage = () => {
   return (
     <ProtectedRoute>
       <div>
-        <Suspense
-          fallback={
-            <div>
-              <Loader className="animate-spin mx-auto" size={40} />
-            </div>
-          }
-        >
+        <Suspense fallback={<ChihiliLoader message="Loading addresses..." />}>
           <AddressConent />
         </Suspense>
       </div>

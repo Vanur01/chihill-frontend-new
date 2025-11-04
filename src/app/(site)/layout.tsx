@@ -2,6 +2,7 @@
 import "../globals.css";
 import Navbar from "@/components/Navbar";
 import NewsletterFooter from "@/components/Footer";
+import WhatsAppButton from "@/components/WhatsAppButton";
 
 export default function SiteLayout({
   children,
@@ -15,6 +16,7 @@ export default function SiteLayout({
         {children}
       </main>
       <NewsletterFooter />
+      <WhatsAppButton />
     </div>
   );
 }

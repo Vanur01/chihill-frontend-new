@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
 import { getOrderDetails, Order } from "@/api/order.api";
 import ProtectedRoute from "@/components/RouteProtect";
+import ChihiliLoader from "@/components/ChihiliLoader";
 
 const orderConfirmation = () => {
   const router = useRouter();
@@ -45,14 +46,7 @@ const orderConfirmation = () => {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen py-4 mt-20 sm:mt-40 font-lato flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary1 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading order details...</p>
-        </div>
-      </div>
-    );
+    return <ChihiliLoader message="Loading order details..." />;
   }
 
   if (error || !order) {

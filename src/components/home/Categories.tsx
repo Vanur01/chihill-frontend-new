@@ -23,17 +23,6 @@ export default function FashionCategories() {
     router.push(`/categoryPage?slug=${slug}`);
   };
 
-  // Show loading state
-  if (isLoading) {
-    return (
-      <div className="w-full mx-auto px-4 md:px-20 py-16 md:py-32">
-        <div className="flex justify-center items-center h-40">
-          <div className="animate-pulse">Loading categories...</div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="w-full mx-auto px-4 md:px-20 py-16 md:py-32">
       {/* Mobile View (Horizontal Scroll) */}

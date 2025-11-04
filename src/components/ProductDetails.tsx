@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useMemo, useEffect, useCallback } from "react";
-import { Heart, Plus, Minus, Star, Truck, Award, Loader2 } from "lucide-react";
+import { Heart, Plus, Minus, Star, Truck, Award } from "lucide-react";
+import ChihiliLoader from "./ChihiliLoader";
 import RecentReviews from "./RecentReview";
 import SizeChartModal from "./SizeChartModal";
 import CustomSizeModal from "./customSizeModal";
@@ -391,16 +392,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({
 
   // Loading state
   if (productLoading) {
-    return (
-      <div className="min-h-screen bg-secondary py-8 pt-16 font-lato">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center items-center h-96">
-            <Loader2 className="w-12 h-12 animate-spin text-primary1" />
-            <span className="ml-3 text-xl">Loading product...</span>
-          </div>
-        </div>
-      </div>
-    );
+    return <ChihiliLoader message="Loading product details..." />;
   }
 
   // Error state
@@ -636,7 +628,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({
                       Rose: "#FF007F",
                     };
 
-                    const bgColor = colorMap[color.name] || "#FFFFFF";
+                    const bgColor = color.name ? (colorMap[color.name] || "#FFFFFF") : "#FFFFFF";
                     return (
                       <button
                         key={color.name}
@@ -822,7 +814,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({
                   >
                     {addLoading ? (
                       <div className="flex items-center justify-center">
-                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        <div className="w-4 h-4 border-2 border-gray-600 border-t-transparent rounded-full animate-spin mr-2" />
                         Adding...
                       </div>
                     ) : (

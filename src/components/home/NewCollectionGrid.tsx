@@ -38,24 +38,6 @@ export default function NewCollectionGrid() {
     return fallbackImages[index % fallbackImages.length];
   };
 
-  // Show loading state
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-secondary1 p-4 sm:p-6 lg:p-8 w-full">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-6 sm:mb-8 md:mb-12">
-            <h1 className="text-xl sm:text-3xl font-light tracking-[0.3rem] sm:tracking-[0.4rem] text-secondary2 mb-10 font-crimson-pro">
-              NEW COLLECTION
-            </h1>
-          </div>
-          <div className="flex justify-center items-center h-40">
-            <div className="animate-pulse">Loading products...</div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   // If no products found
   if (products.length === 0) {
     return (

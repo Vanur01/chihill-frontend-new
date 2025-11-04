@@ -1,22 +1,29 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useWishlistStore } from "@/store/wishlistStore";
 import ProtectedRoute from "@/components/RouteProtect";
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, Loader, ShoppingCart, Trash2 } from "lucide-react";
+import { Heart, ShoppingCart, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
+import ChihiliLoader from "@/components/ChihiliLoader";
 
 const WishlistPage = () => {
-  const { items, loading, error, fetchWishlist, removeItem } =
-    useWishlistStore();
+  const { items, error, fetchWishlist, removeItem } = useWishlistStore();
   const { addToCart } = useCartStore();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchWishlist();
+    const loadWishlist = async () => {
+      setIsLoading(true);
+      await fetchWishlist();
+      setIsLoading(false);
+    };
+    
+    loadWishlist();
   }, [fetchWishlist]);
 
   const handleRemoveFromWishlist = async (productId: string) => {
@@ -41,12 +48,8 @@ const WishlistPage = () => {
   };
 
   const WishlistContent = () => {
-    if (loading) {
-      return (
-        <div className="min-h-screen flex items-center justify-center">
-          <Loader className="w-8 h-8 animate-spin text-primary1" />
-        </div>
-      );
+    if (isLoading) {
+      return <ChihiliLoader message="Loading your wishlist..." />;
     }
 
     if (error) {

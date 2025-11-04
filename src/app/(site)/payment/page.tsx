@@ -1,15 +1,13 @@
 import React, { Suspense } from 'react'
 import { PaymentContent } from './PaymentContent'
 import ProtectedRoute from '@/components/RouteProtect'
-import { Loader } from 'lucide-react'
+import ChihiliLoader from '@/components/ChihiliLoader'
 
 const PaymentPage=()=> {
   return (
     <ProtectedRoute>
       <div>
-        <Suspense fallback={<div>
-          <Loader className='animate-spin mx-auto mt-20' size={40} />
-        </div>}>
+        <Suspense fallback={<ChihiliLoader message="Loading payment options..." />}>
           <PaymentContent />
         </Suspense> 
       </div>

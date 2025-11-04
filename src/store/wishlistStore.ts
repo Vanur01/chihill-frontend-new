@@ -20,7 +20,6 @@ interface WishlistItem {
 interface WishlistStore {
   items: WishlistItem[];
   itemIds: string[]; // Array of product IDs from /auth/me
-  loading: boolean;
   error: string | null;
   fetchWishlist: () => Promise<void>;
   addItem: (productId: string) => Promise<void>;
@@ -33,12 +32,11 @@ interface WishlistStore {
 export const useWishlistStore = create<WishlistStore>((set, get) => ({
   items: [],
   itemIds: [],
-  loading: false,
   error: null,
 
   fetchWishlist: async () => {
     try {
-      set({ loading: true, error: null });
+      set({ error: null });
       const response = await getWishlist();
       if (response.success) {
         const wishlistItems = response.data.items || [];
@@ -49,8 +47,6 @@ export const useWishlistStore = create<WishlistStore>((set, get) => ({
       }
     } catch (error: any) {
       set({ error: error.message || 'Failed to fetch wishlist' });
-    } finally {
-      set({ loading: false });
     }
   },
 

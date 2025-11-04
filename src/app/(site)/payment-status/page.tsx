@@ -10,10 +10,10 @@ import {
   ArrowRight,
   Home,
   RotateCcw,
-  Loader2,
 } from "lucide-react";
 import { Suspense } from "react";
 import ProtectedRoute from "@/components/RouteProtect";
+import ChihiliLoader from "@/components/ChihiliLoader";
 import {
   usePaymentActions,
   usePaymentLoading,
@@ -180,14 +180,7 @@ function OrderSuccessContent() {
   }, [success, orderDetails?.orderId, router]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center font-lato">
-        <div className="flex flex-col items-center">
-          <Loader2 className="w-12 h-12 text-primary1 animate-spin mb-4" />
-          <p className="text-gray-600">Checking payment status...</p>
-        </div>
-      </div>
-    );
+    return <ChihiliLoader message="Checking payment status..." />;
   }
 
   if (error) {
@@ -704,13 +697,7 @@ function OrderSuccessContent() {
 export default function OrderSuccess() {
   return (
     <ProtectedRoute>
-      <Suspense
-        fallback={
-          <div className="min-h-screen flex items-center justify-center font-lato">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary1"></div>
-          </div>
-        }
-      >
+      <Suspense fallback={<ChihiliLoader message="Loading order details..." />}>
         <OrderSuccessContent />
       </Suspense>
     </ProtectedRoute>

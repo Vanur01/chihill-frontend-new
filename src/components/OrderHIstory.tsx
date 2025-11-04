@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ArrowRight, ChevronRight, Star, Loader2, ChevronUp } from "lucide-react";
+import { ArrowRight, ChevronRight, Star, ChevronUp } from "lucide-react";
+import ChihiliLoader from "./ChihiliLoader";
 import Link from "next/link";
 import { getUserOrders, type Order, type GetUserOrdersParams } from "@/api/order.api";
 
@@ -162,10 +163,7 @@ const OrderHistory = () => {
             ORDER HISTORY
           </h1>
         </div>
-        <div className="flex justify-center items-center py-12">
-          <Loader2 className="w-8 h-8 animate-spin text-gray-600" />
-          <span className="ml-2 text-gray-600">Loading your orders...</span>
-        </div>
+        <ChihiliLoader fullScreen={false} message="Loading your orders..." />
       </div>
     );
   }
@@ -321,7 +319,7 @@ const OrderHistory = () => {
             >
               {loadingMore ? (
                 <>
-                  <Loader2 className="inline-block w-4 h-4 animate-spin mr-2" />
+                  <div className="inline-block w-4 h-4 border-2 border-gray-600 border-t-transparent rounded-full animate-spin mr-2" />
                   Loading more orders...
                 </>
               ) : (
@@ -335,7 +333,7 @@ const OrderHistory = () => {
 
           {loadingMore && hasInfiniteScroll && (
             <div className="flex items-center justify-center py-4">
-              <Loader2 className="w-6 h-6 animate-spin mr-2 text-gray-600" />
+              <div className="w-6 h-6 border-2 border-gray-600 border-t-transparent rounded-full animate-spin mr-2" />
               <span className="text-gray-600">Loading more orders...</span>
             </div>
           )}

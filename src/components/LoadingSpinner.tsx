@@ -30,7 +30,10 @@ const ChihiliLoader: React.FC<ChihiliLoaderProps> = ({
         {/* Animated Logo Container */}
         <div className="relative w-48 h-48">
           {/* Outer circular loader */}
-          <svg className="absolute inset-0 w-full h-full animate-spin-slow" viewBox="0 0 100 100">
+          <svg
+            className="absolute inset-0 w-full h-full animate-spin-slow"
+            viewBox="0 0 100 100"
+          >
             <circle
               cx="50"
               cy="50"
@@ -54,7 +57,10 @@ const ChihiliLoader: React.FC<ChihiliLoaderProps> = ({
           </svg>
 
           {/* Inner circular loader */}
-          <svg className="absolute inset-0 w-full h-full animate-spin-reverse" viewBox="0 0 100 100">
+          <svg
+            className="absolute inset-0 w-full h-full animate-spin-reverse"
+            viewBox="0 0 100 100"
+          >
             <circle
               cx="50"
               cy="50"
@@ -81,7 +87,7 @@ const ChihiliLoader: React.FC<ChihiliLoaderProps> = ({
           <div className="absolute inset-0 flex items-center justify-center animate-float">
             <div className={`${sizeClasses[size]} relative animate-pulse-soft`}>
               <Image
-                src="/logo.png"
+                src="/chihiliLogo.png"
                 alt="Chihili"
                 fill
                 className="object-contain drop-shadow-2xl"

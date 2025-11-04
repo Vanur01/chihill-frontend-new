@@ -81,7 +81,7 @@ const ChihiliLoader: React.FC<ChihiliLoaderProps> = ({
           <div className="absolute inset-0 flex items-center justify-center animate-float">
             <div className={`${sizeClasses[size]} relative animate-pulse-soft`}>
               <Image
-                src="/logo.png"
+                src="/chihiliLogo.png"
                 alt="Chihili"
                 fill
                 className="object-contain drop-shadow-2xl"

@@ -191,28 +191,28 @@ export default function NewsletterFooter() {
             {/* Social Media Links */}
             <div className="flex space-x-3 mb-4">
               <a
-                href="https://facebook.com/chihili"
+                href="https://www.facebook.com/share/1EXxr6vwz8/?mibextid=wwXIfr"
                 className="text-gray-600 hover:text-blue-600 transition-colors"
                 aria-label="Facebook"
               >
                 <Facebook size={20} />
               </a>
               <a
-                href="https://instagram.com/chihili"
+                href="https://www.instagram.com/chihili_online/"
                 className="text-gray-600 hover:text-pink-600 transition-colors"
                 aria-label="Instagram"
               >
                 <Instagram size={20} />
               </a>
               <a
-                href="https://twitter.com/chihili"
+                href="https://x.com/chihili_store"
                 className="text-gray-600 hover:text-blue-400 transition-colors"
                 aria-label="Twitter"
               >
                 <Twitter size={20} />
               </a>
               <a
-                href="https://youtube.com/chihili"
+                href="https://www.youtube.com/@chihili"
                 className="text-gray-600 hover:text-red-600 transition-colors"
                 aria-label="YouTube"
               >
@@ -231,15 +231,23 @@ export default function NewsletterFooter() {
                   hello@chihili.com
                 </a>
               </div>
-              <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2">
                 <Phone size={16} className="text-gray-500" />
                 <a
                   href="tel:+919876543210"
                   className="hover:text-gray-900 transition-colors"
                 >
-                  +91 98765 43210
+                  +91 98765 43210 / 
                 </a>
-              </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                 <a
+                  href="tel:+919124725574"
+                  className="hover:text-gray-900 transition-colors"
+                >
+                  +91 91247 25574
+                </a>
+                </div>
             </div>
           </div>
         </div>

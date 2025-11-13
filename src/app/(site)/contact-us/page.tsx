@@ -64,9 +64,9 @@ const ContactUsPage = () => {
       icon: <Headphones className="w-8 h-8 text-primary" />,
       title: "WhatsApp Support",
       description: "Quick support via WhatsApp",
-      contact: "+91 98765 43210",
+      contact: "+91 91247 25574",
       availability: "Mon-Sat, 9 AM - 7 PM",
-      action: "https://wa.me/919876543210"
+      action: "https://wa.me/919124725574"
     }
   ];
 

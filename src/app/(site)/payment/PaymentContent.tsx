@@ -322,9 +322,9 @@ export const PaymentContent = () => {
                         <div className="flex items-center gap-2">
                           <div className="flex flex-col">
                             <span className="text-zinc-800">GST @ 5%</span>
-                            {hasHighValueItems && (
+                            {/* {hasHighValueItems && (
                               <span className="text-xs text-blue-600">(Split Method Applied)</span>
-                            )}
+                            )} */}
                           </div>
                           <div className="w-4 h-4 bg-zinc-800 rounded-full flex items-center justify-center text-white text-xs">
                             ?
@@ -335,14 +335,14 @@ export const PaymentContent = () => {
                         </span>
                       </div>
 
-                      {hasHighValueItems && (
+                      {/* {hasHighValueItems && (
                         <div className="bg-blue-50 p-3 rounded-md border border-blue-200 -mx-2 sm:-mx-0">
                           <p className="text-xs font-medium text-blue-800 mb-1">GST Optimization Applied</p>
                           <p className="text-xs text-blue-700">
                             Items {`>`} ₹2,500: Split into fabric + stitching @ 5% each (instead of 18%)
                           </p>
                         </div>
-                      )}
+                      )} */}
 
                       <div className="flex justify-between text-lg font-medium">
                         <span>Total Payable (Inc. GST)</span>
@@ -445,7 +445,7 @@ export const PaymentContent = () => {
                                   <div>Price: ₹{(priceBeforeGST / item.quantity).toFixed(2)}</div>
                                   <div>+ GST: ₹{(gstAmount / item.quantity).toFixed(2)}</div>
                                   {itemTotal > 2500 && (
-                                    <div className="text-blue-600">5% GST (Split)</div>
+                                    <div className="text-blue-600">5% GST</div>
                                   )}
                                   {itemTotal <= 2500 && (
                                     <div className="text-green-600">5% GST</div>
@@ -553,7 +553,7 @@ export const PaymentContent = () => {
         </div>
 
         {/* GST Information Section */}
-        {cart && cart.items && cart.items.length > 0 && (
+        {/* {cart && cart.items && cart.items.length > 0 && (
           <div className="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 p-4 sm:p-6">
             <h3 className="text-base sm:text-lg font-semibold text-blue-900 mb-3 flex items-center">
               <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -604,7 +604,7 @@ export const PaymentContent = () => {
               </p>
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

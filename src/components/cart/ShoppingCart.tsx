@@ -230,9 +230,9 @@ const ShoppingCart = () => {
                             return (
                               <div className="text-xs text-gray-600 mt-1">
                                 <div>Price: ₹{priceBeforeGST.toFixed(2)} + GST ₹{gstAmount.toFixed(2)}</div>
-                                {itemTotal > 2500 && (
+                                {/* {itemTotal > 2500 && (
                                   <div className="text-blue-600">GST @ 5% (Split Method)</div>
-                                )}
+                                )} */}
                                 {itemTotal <= 2500 && (
                                   <div className="text-green-600">GST @ 5% (Standard)</div>
                                 )}
@@ -347,9 +347,9 @@ const ShoppingCart = () => {
                       <span className="text-sm sm:text-base text-gray-600 font-lato">
                         GST @ {gstCalculation.effectiveGSTRate}%
                       </span>
-                      {gstCalculation.hasHighValueItems && (
+                      {/* {gstCalculation.hasHighValueItems && (
                         <span className="text-xs text-blue-600 font-lato">(Split Method Applied)</span>
-                      )}
+                      )} */}
                     </div>
                     <Info className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
                   </div>
@@ -358,14 +358,14 @@ const ShoppingCart = () => {
                   </span>
                 </div>
 
-                {gstCalculation.hasHighValueItems && (
+                {/* {gstCalculation.hasHighValueItems && (
                   <div className="bg-blue-50 p-2 sm:p-3 rounded-md border border-blue-200 -mx-1 sm:-mx-0">
                     <p className="text-xs font-medium text-blue-800 mb-1">GST Optimization Applied</p>
                     <p className="text-xs text-blue-700">
                       Items {`>`} ₹2,500: Split into fabric + stitching components @ 5% each (instead of 18%)
                     </p>
                   </div>
-                )}
+                )} */}
 
                 <div className="flex justify-between items-center">
                   <span className="text-sm sm:text-lg font-medium font-lato">

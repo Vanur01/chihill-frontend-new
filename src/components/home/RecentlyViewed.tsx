@@ -164,6 +164,322 @@ export default function RecentlyViewed() {
   const { recentlyViewed, loadingRecentlyViewed, fetchRecentlyViewed } = useHomeStore();
   const [isLoading, setIsLoading] = useState(true);
 
+  // Static data for when no recently viewed products are available
+  const staticProducts: any[] = [
+    {
+      "_id": "68c06404c99551d886e434bf",
+      "vendorId": "68b9542401358b1e6a6b179b",
+      "name": "POWDER BLUE MODAL DRAPED SKIRT SET WITH HALTER BLOUSE",
+      "slug": "powder-blue-modal-draped-skirt-set-with-halter-blouse-2566",
+      "shortDescription": "Elevate your festive style with our 'Powder Blue Modal Draped Skirt Set with Halter Blouse', a fusion silhouette that blends comfort with modern elegance",
+      "categories": [
+        {
+          "_id": "68b9a61c01358b1e6a6b1b92",
+          "name": "CO-ORD SET",
+          "slug": "co-ord-set-6b6c"
+        }
+      ],
+      "status": "active",
+      "images": [
+        "https://chihill.s3.ap-south-1.amazonaws.com/prod/products/product-26.webp"
+      ],
+      "variants": [
+        {
+          "attributes": {
+            "size": "M",
+            "color": "powder blue "
+          },
+          "sku": "B179B-POW-M-468",
+          "title": "size variant",
+          "price": 6299,
+          "mrp": 6999,
+          "images": [
+            "https://chihili-bucket.s3.ap-south-1.amazonaws.com/dev/product-variants/1757438989247-66.webp",
+            "https://chihili-bucket.s3.ap-south-1.amazonaws.com/dev/product-variants/1757438990227-67.webp",
+            "https://chihili-bucket.s3.ap-south-1.amazonaws.com/dev/product-variants/1757438990905-68.webp"
+          ],
+          "stock": 2
+        }
+      ],
+      "avgRating": 0,
+      "ratingsCount": 0,
+      "totalReviews": 0
+    },
+    {
+      "_id": "68c069f1c99551d886e43534",
+      "vendorId": "68b9542401358b1e6a6b179b",
+      "name": "BLACK & MAROON IKAT CO-ORD SET",
+      "slug": "black-and-maroon-ikat-co-ord-set-cb5d",
+      "shortDescription": "Elevate your festive look with our 'Black & Maroon Ikat Co-ord Set', a seamless blend of traditional ikat craftsmanship and contemporary elegance",
+      "categories": [
+        {
+          "_id": "68b9a61c01358b1e6a6b1b92",
+          "name": "CO-ORD SET",
+          "slug": "co-ord-set-6b6c"
+        }
+      ],
+      "status": "active",
+      "images": [
+        "https://chihill.s3.ap-south-1.amazonaws.com/prod/products/product-29.webp"
+      ],
+      "variants": [
+        {
+          "attributes": {
+            "size": "M",
+            "color": "maroon,black"
+          },
+          "sku": "B179B-MAR-M-134",
+          "title": "size variant",
+          "price": 4299,
+          "mrp": 4999,
+          "images": [
+            "https://chihili-bucket.s3.ap-south-1.amazonaws.com/dev/product-variants/1757440505602-89.webp",
+            "https://chihili-bucket.s3.ap-south-1.amazonaws.com/dev/product-variants/1757440506812-90.webp",
+            "https://chihili-bucket.s3.ap-south-1.amazonaws.com/dev/product-variants/1757440507437-91.webp",
+            "https://chihili-bucket.s3.ap-south-1.amazonaws.com/dev/product-variants/1757440508092-92.webp"
+          ],
+          "stock": 1
+        }
+      ],
+      "avgRating": 0,
+      "ratingsCount": 0,
+      "totalReviews": 0
+    },
+    {
+      "_id": "68be9df9c8c09cf86e428cc9",
+      "vendorId": "68b9542401358b1e6a6b179b",
+      "name": "IKKAT CO-ORD DRESS",
+      "slug": "ikkat-co-ord-dress-9bae",
+      "shortDescription": "Embrace contemporary elegance with our Ikkat Co-Ord Dress, a perfect blend of modern style and traditional fabric",
+      "categories": [
+        {
+          "_id": "68b9a61c01358b1e6a6b1b92",
+          "name": "CO-ORD SET",
+          "slug": "co-ord-set-6b6c"
+        }
+      ],
+      "status": "active",
+      "images": [
+        "https://chihill.s3.ap-south-1.amazonaws.com/prod/products/product-2.webp"
+      ],
+      "variants": [
+        {
+          "attributes": {
+            "size": "M",
+            "color": "BLUE"
+          },
+          "sku": "B179B-BLU-M-523",
+          "title": "SIZE VARIANT",
+          "price": 5499,
+          "mrp": 5999,
+          "images": [
+            "https://chihili-bucket.s3.ap-south-1.amazonaws.com/dev/product-variants/1757322752746-83.webp",
+            "https://chihili-bucket.s3.ap-south-1.amazonaws.com/dev/product-variants/1757322754059-84.webp"
+          ],
+          "stock": 12
+        }
+      ],
+      "avgRating": 0,
+      "ratingsCount": 0,
+      "totalReviews": 0
+    },
+    {
+      "_id": "68bea3efc8c09cf86e428ec3",
+      "vendorId": "68b9542401358b1e6a6b179b",
+      "name": "KOTPAD GOWN WITH MODAL JACKET",
+      "slug": "kotpad-gown-with-modal-jacket-e76c",
+      "shortDescription": "Step into artisanal elegance with our Kotpad Gown with Modal Jacket, a fusion of traditional handloom craft and contemporary styling. Designed for women who love understated luxury, this ensemble is perfect for festive gatherings, cultural events, or sophisticated evenings",
+      "categories": [
+        {
+          "_id": "68b9a60301358b1e6a6b1b8a",
+          "name": "GOWN",
+          "slug": "gown-212c"
+        }
+      ],
+      "status": "active",
+      "images": [
+        "https://chihill.s3.ap-south-1.amazonaws.com/prod/products/product-7.webp"
+      ],
+      "variants": [
+        {
+          "attributes": {
+            "size": "M",
+            "color": "beige , multi printed"
+          },
+          "sku": "B179B-BEI-M-487",
+          "title": "size variant",
+          "price": 4999,
+          "mrp": 5500,
+          "images": [
+            "https://chihili-bucket.s3.ap-south-1.amazonaws.com/dev/product-variants/1757324276859-11.webp",
+            "https://chihili-bucket.s3.ap-south-1.amazonaws.com/dev/product-variants/1757324277388-12.webp",
+            "https://chihili-bucket.s3.ap-south-1.amazonaws.com/dev/product-variants/1757324277915-13.webp",
+            "https://chihili-bucket.s3.ap-south-1.amazonaws.com/dev/product-variants/1757324278443-14.webp"
+          ],
+          "stock": 12
+        }
+      ],
+      "avgRating": 0,
+      "ratingsCount": 0,
+      "totalReviews": 0
+    },
+    {
+      "_id": "68beaad5c8c09cf86e42906c",
+      "vendorId": "68b9542401358b1e6a6b179b",
+      "name": "IKKAT LONG GOWN WITH ELEGANT FULL SLEEVE JACKET",
+      "slug": "ikkat-long-gown-with-elegant-full-sleeve-jacket-2dd4",
+      "shortDescription": "Embrace the fusion of tradition and modernity with our 'Ikkat Long Gown with Elegant Full Sleeve Jacket', a garment that exudes sophistication and elegance.",
+      "categories": [
+        {
+          "_id": "68b9a60301358b1e6a6b1b8a",
+          "name": "GOWN",
+          "slug": "gown-212c"
+        }
+      ],
+      "status": "active",
+      "images": [
+        "https://chihill.s3.ap-south-1.amazonaws.com/prod/products/product-8.webp"
+      ],
+      "variants": [
+        {
+          "attributes": {
+            "size": "L",
+            "color": "denim blue"
+          },
+          "sku": "B179B-DEN-L-250",
+          "title": "Size variant",
+          "price": 10299,
+          "mrp": 10499,
+          "images": [
+            "https://chihili-bucket.s3.ap-south-1.amazonaws.com/dev/product-variants/1757326046124-72.webp",
+            "https://chihili-bucket.s3.ap-south-1.amazonaws.com/dev/product-variants/1757326047666-73.webp",
+            "https://chihili-bucket.s3.ap-south-1.amazonaws.com/dev/product-variants/1757326049240-74.webp",
+            "https://chihili-bucket.s3.ap-south-1.amazonaws.com/dev/product-variants/1757326050794-75.webp"
+          ],
+          "stock": 2
+        }
+      ],
+      "avgRating": 0,
+      "ratingsCount": 0,
+      "totalReviews": 0
+    },
+    {
+      "_id": "68beabdec8c09cf86e429089",
+      "vendorId": "68b9542401358b1e6a6b179b",
+      "name": "KOTPAD FAIRY SHORT DRESS",
+      "slug": "kotpad-fairy-short-dress-c152",
+      "shortDescription": "Step into a whimsical world with our Kotpad Fairy Short Dress, where traditional meets playful",
+      "categories": [
+        {
+          "_id": "68b9a60301358b1e6a6b1b8a",
+          "name": "GOWN",
+          "slug": "gown-212c"
+        }
+      ],
+      "status": "active",
+      "images": [
+        "https://chihill.s3.ap-south-1.amazonaws.com/prod/products/product-9.webp"
+      ],
+      "variants": [
+        {
+          "attributes": {
+            "size": "M",
+            "color": "off-white and mustard color "
+          },
+          "sku": "B179B-OFF-M-845",
+          "title": "Size variant",
+          "price": 5299,
+          "mrp": 5999,
+          "images": [
+            "https://chihili-bucket.s3.ap-south-1.amazonaws.com/dev/product-variants/1757326309354-63.webp",
+            "https://chihili-bucket.s3.ap-south-1.amazonaws.com/dev/product-variants/1757326310895-64.webp",
+            "https://chihili-bucket.s3.ap-south-1.amazonaws.com/dev/product-variants/1757326312466-65.webp"
+          ],
+          "stock": 12
+        }
+      ],
+      "avgRating": 0,
+      "ratingsCount": 0,
+      "totalReviews": 0
+    },
+    {
+      "_id": "68bead50c8c09cf86e4290cd",
+      "vendorId": "68b9542401358b1e6a6b179b",
+      "name": "GEORGETTE SAREE WITH EMBELLISHED BLOUSE",
+      "slug": "georgette-saree-with-embellished-blouse-9261",
+      "shortDescription": "Grace meets glamour in this Georgette Saree with Embellished Blouse, designed for the modern woman who loves effortless elegance with a touch of sparkle. Perfect for festive occasions, weddings, and evening parties, this ensemble brings together flowing charm and refined detailing.",
+      "categories": [
+        {
+          "_id": "68a56aa85059b18acb440479",
+          "name": "SAREE",
+          "slug": "saree-2db1"
+        }
+      ],
+      "status": "active",
+      "images": [
+        "https://chihill.s3.ap-south-1.amazonaws.com/prod/products/product-10.webp"
+      ],
+      "variants": [
+        {
+          "attributes": {
+            "color": "pink, blue"
+          },
+          "sku": "B179B-PIN-00-179",
+          "title": "color variant",
+          "price": 8999,
+          "mrp": 9500,
+          "images": [
+            "https://chihili-bucket.s3.ap-south-1.amazonaws.com/dev/product-variants/1757326679498-100.webp",
+            "https://chihili-bucket.s3.ap-south-1.amazonaws.com/dev/product-variants/1757326680055-101.webp"
+          ],
+          "stock": 12
+        }
+      ],
+      "avgRating": 0,
+      "ratingsCount": 0,
+      "totalReviews": 0
+    },
+    {
+      "_id": "68beae2cc8c09cf86e4290ea",
+      "vendorId": "68b9542401358b1e6a6b179b",
+      "name": "TUSSER SAREE IN MADHUBAI PAINTING",
+      "slug": "tusser-saree-in-madhubai-painting-a8dc",
+      "shortDescription": "Timeless tradition meets artistic elegance in this Tusser Silk Saree with Madhubani Painting, crafted for the woman who cherishes heritage with a touch of contemporary grace. Ideal for festive gatherings, cultural celebrations, or elegant daytime events, this saree is a wearable piece of art that celebrates Indian craftsmanship.",
+      "categories": [
+        {
+          "_id": "68a56aa85059b18acb440479",
+          "name": "SAREE",
+          "slug": "saree-2db1"
+        }
+      ],
+      "status": "active",
+      "images": [
+        "https://chihill.s3.ap-south-1.amazonaws.com/prod/products/product-11.webp"
+      ],
+      "variants": [
+        {
+          "attributes": {
+            "size": "L",
+            "color": "natural beige , multocolor print"
+          },
+          "sku": "B179B-NAT-L-837",
+          "title": "color variant",
+          "price": 9999,
+          "mrp": 10500,
+          "images": [
+            "https://chihili-bucket.s3.ap-south-1.amazonaws.com/dev/product-variants/1757326900548-95.webp",
+            "https://chihili-bucket.s3.ap-south-1.amazonaws.com/dev/product-variants/1757326902066-96.webp",
+            "https://chihili-bucket.s3.ap-south-1.amazonaws.com/dev/product-variants/1757326902678-97.webp"
+          ],
+          "stock": 1
+        }
+      ],
+      "avgRating": 0,
+      "ratingsCount": 0,
+      "totalReviews": 0
+    }
+  ];
+
   useEffect(() => {
     const loadRecentlyViewed = async () => {
       setIsLoading(true);
@@ -178,7 +494,7 @@ export default function RecentlyViewed() {
     router.push(`/product-details/${productSlug}?id=${productId}`);
   };
 
-  const displayItems = recentlyViewed;
+  const displayItems = recentlyViewed.length > 0 ? recentlyViewed : staticProducts;
 
   // React-slick settings
   const sliderSettings = {
@@ -220,22 +536,6 @@ export default function RecentlyViewed() {
       },
     ],
   };
-
-  // If no recently viewed products are available
-  if (recentlyViewed.length === 0) {
-    return (
-      <div className="w-full py-20">
-        <div className="text-center mb-6 sm:mb-8 md:mb-12">
-          <h1 className="text-xl sm:text-3xl font-light tracking-[0.3rem] sm:tracking-[0.4rem] text-secondary2 mb-10 font-crimson-pro">
-            RECENTLY VIEWED
-          </h1>
-        </div>
-        <div className="flex justify-center items-center h-40">
-          <p className="text-gray-600">No recently viewed products yet. Start exploring our collections!</p>
-        </div>
-      </div>
-    );
-  }
 
   // Helper function to get first product image or fallback
   const getProductImage = (product: any): string => {

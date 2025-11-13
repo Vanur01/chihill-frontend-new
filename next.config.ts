@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
     domains: [
       "via.placeholder.com",
       "chihili-bucket.s3.ap-south-1.amazonaws.com",
+      "chihill.s3.ap-south-1.amazonaws.com",
     ],
   },
   typescript: {

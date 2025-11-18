@@ -80,7 +80,7 @@ export default function SignupWithEmail() {
                 <input
                   type="tel"
                   id="phone"
-                  placeholder="9876543210"
+                  placeholder="7008013330"
                   className="flex-1 px-4 py-3 text-gray-900 outline-none sm:text-sm"
                   pattern="[0-9]{10}"
                   required

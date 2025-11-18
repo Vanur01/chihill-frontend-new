@@ -40,17 +40,17 @@ const ContactUsPage = () => {
       icon: <Phone className="w-8 h-8 text-primary" />,
       title: "Call Us",
       description: "Speak with our customer service team",
-      contact: "+91 98765 43210",
+      contact: "+91  70080 13330",
       availability: "Mon-Sat, 9 AM - 7 PM",
-      action: "tel:+919876543210"
+      action: "tel:+91 7008013330"
     },
     {
       icon: <Mail className="w-8 h-8 text-primary" />,
       title: "Email Us",
       description: "Send us your queries and feedback",
-      contact: "hello@chihili.com",
+      contact: "contact@chihili.com",
       availability: "24/7 Response within 24 hours",
-      action: "mailto:hello@chihili.com"
+      action: "mailto:contact@chihili.com"
     },
     {
       icon: <MessageCircle className="w-8 h-8 text-primary" />,
@@ -73,9 +73,9 @@ const ContactUsPage = () => {
   const officeLocations = [
     {
       title: "Warehouse & Production",
-      address: "789, Industrial Area, Mancheswar, Bhubaneswar, Odisha 751010",
-      phone: "+91 98765 43212",
-      email: "production@chihili.com",
+      address: "Plot No. 581, Ground Floor, GIET Building, Ekamra Vihar, Bhubaneswar - 751015.",
+      phone: "+91  70080 13330",
+      email: "contact@chihili.com",
       hours: "Monday - Saturday: 8:00 AM - 6:00 PM"
     }
   ];
@@ -337,7 +337,7 @@ const ContactUsPage = () => {
         </div>
 
         {/* Map Section (Placeholder) */}
-        <div className="bg-gray-100 rounded-lg p-8 text-center">
+        {/* <div className="bg-gray-100 rounded-lg p-8 text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Find Us</h2>
           <p className="text-gray-600 mb-6">Our main office is located in the heart of Bhubaneswar</p>
           <div className="bg-gray-200 h-64 rounded-lg flex items-center justify-center">
@@ -349,7 +349,7 @@ const ContactUsPage = () => {
               </p>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

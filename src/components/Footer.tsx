@@ -150,17 +150,7 @@ export default function NewsletterFooter() {
           {/* Order Tracking */}
           <div>
             <h4 className="font-semibold mb-2">Order Tracking</h4>
-            <ul className="space-y-1">
-              <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
-                  Order History
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
-                  Track Order
-                </a>
-              </li>
+            <ul className="space-y-1">            
               <li>
                 <a href="#" className="hover:text-gray-900 transition-colors">
                   Shipping Policies
@@ -225,19 +215,19 @@ export default function NewsletterFooter() {
               <div className="flex items-center space-x-2">
                 <Mail size={16} className="text-gray-500" />
                 <a
-                  href="mailto:hello@chihili.com"
+                  href="mailto:contact@chihili.com"
                   className="hover:text-gray-900 transition-colors"
                 >
-                  hello@chihili.com
+                  contact@chihili.com
                 </a>
               </div>
                 <div className="flex items-center space-x-2">
                 <Phone size={16} className="text-gray-500" />
                 <a
-                  href="tel:+919876543210"
+                  href="tel:+917008013330"
                   className="hover:text-gray-900 transition-colors"
                 >
-                  +91 98765 43210 / 
+                  +91  70080 13330 / 
                 </a>
                 </div>
                 <div className="flex items-center space-x-2">

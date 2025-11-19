@@ -186,6 +186,7 @@ export default function Support() {
           <h2 className="text-2xl font-semibold text-gray-800 mb-4 font-crimson-pro">
             We'd Love Your Feedback
           </h2>
+          
           <p className="text-gray-700 mb-4">
             Your experience matters to us. If you have suggestions for improvement or feedback about our products and services, please share it with us.
           </p>

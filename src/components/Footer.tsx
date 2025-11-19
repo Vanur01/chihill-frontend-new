@@ -152,17 +152,17 @@ export default function NewsletterFooter() {
             <h4 className="font-semibold mb-2">Order Tracking</h4>
             <ul className="space-y-1">            
               <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
+                <a href="/shipping-policies" className="hover:text-gray-900 transition-colors">
                   Shipping Policies
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
+                <a href="/return-policies" className="hover:text-gray-900 transition-colors">
                   Return Policies
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
+                <a href="/refund-policies" className="hover:text-gray-900 transition-colors">
                   Refund Policies
                 </a>
               </li>

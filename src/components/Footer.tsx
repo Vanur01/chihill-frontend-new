@@ -167,7 +167,7 @@ export default function NewsletterFooter() {
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
+                <a href="/support" className="hover:text-gray-900 transition-colors">
                   Support
                 </a>
               </li>

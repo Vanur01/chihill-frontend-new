@@ -273,7 +273,7 @@ const BestSellingCarousel = () => {
           <div className="text-center mt-8 md:mt-12">
             <button 
               className="border-2 border-gray-800 text-gray-800 px-6 md:px-8 py-2 md:py-3 text-sm md:text-base font-medium tracking-wider hover:bg-gray-800 hover:text-white transition-all duration-300 flex items-center mx-auto space-x-2 group"
-              onClick={() => router.push('/products')}
+              onClick={() => router.push('/categoryPage')}
             >
               <span>Shop Now</span>
               <ArrowRight
